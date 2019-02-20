@@ -9,16 +9,27 @@
         "input": null,
         "output": null
     },
-    "parameters": [ 
+    "parameters": [
         {
-            "id": "parameter_1",
+            "id": "fbamodel_id",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseFBA.FBAModel" ]
+            }
+        },
+        {
+            "id": "output_id",
             "optional": true,
             "advanced": false,
             "allow_multiple": false,
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
-                "valid_ws_types": [ ]
+                "valid_ws_typess": [ "KBaseFBA.FBAModel" ]
             }
         }
     ],
@@ -26,15 +37,19 @@
         "service-mapping": {
             "url": "",
             "name": "mightymorphingmodels",
-            "method": "your_method",
+            "method": "morph_model",
             "input_mapping": [
                 {
                     "narrative_system_variable": "workspace",
-                    "target_argument_position": 0
+                    "target_property": "workspace"
                 },
                 {
-                    "input_parameter": "parameter_1",
-                    "target_argument_position": 1
+                    "input_parameter": "fbamodel_id",
+                    "target_property": "fbamodel_id"
+                },
+                {
+                    "input_parameter": "output_id",
+                    "target_property": "output_id"
                 }
             ],
             "output_mapping": [
@@ -43,8 +58,12 @@
                     "target_property": "output"
                 },
                 {
-                    "input_parameter": "parameter_1",
-                    "target_property": "input"
+                    "service_method_output_path": [0,"report_name"],
+                    "target_property": "report_name"
+                },
+                {
+                    "service_method_output_path": [0,"report_ref"],
+                    "target_property": "report_ref"
                 },
                 {
                     "narrative_system_variable": "workspace",

@@ -33,6 +33,19 @@ class mightymorphingmodels(object):
             trust_all_ssl_certificates=trust_all_ssl_certificates,
             auth_svc=auth_svc)
 
+    def morph_model(self, params, context=None):
+        """
+        Morph Function
+        :param params: instance of type "CallingParams" (Insert your typespec
+           information here.) -> structure: parameter "workspace" of String,
+           parameter "fbamodel_id" of String, parameter "output_id" of String
+        :returns: instance of type "CallingResults" -> structure: parameter
+           "report_name" of String, parameter "report_ref" of String
+        """
+        return self._client.call_method(
+            'mightymorphingmodels.morph_model',
+            [params], self._service_ver, context)
+
     def status(self, context=None):
         return self._client.call_method('mightymorphingmodels.status',
                                         [], self._service_ver, context)

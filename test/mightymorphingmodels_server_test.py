@@ -82,7 +82,7 @@ class mightymorphingmodelsTest(unittest.TestCase):
         #                                  'objects': []})
         #
         # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
+        ret = self.getImpl().your_method(self.getContext(), {"fbamodel_id": "550", "workspace": "10232"})
         #
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods

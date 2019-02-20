@@ -2,7 +2,7 @@ module-name:
     mightymorphingmodels
 
 module-description:
-    A KBase module
+  "A KBase module for model-morphing: a process in which a metabolic model is translated from one genome to another without losing ability produce bio-mass"
 
 service-language:
     python
