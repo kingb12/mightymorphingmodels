@@ -7,9 +7,11 @@ module mightymorphingmodels {
         Insert your typespec information here.
     */
     typedef structure {
-    	string workspace;
+    	string fbamodel_workspace;
       string fbamodel_id;
-      string output_id;
+      string media_workspace;
+      string media_id;
+      string workspace;
     } CallingParams;
 
     typedef structure {

@@ -2,6 +2,7 @@
 #BEGIN_HEADER
 from service import Service
 from objects import *
+from morph import Morph
 import uuid, sys, os, traceback
 #END_HEADER
 
@@ -23,7 +24,7 @@ class mightymorphingmodels:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kingb12/mightymorphingmodels.git"
-    GIT_COMMIT_HASH = "abbe1b7aff8aee126d2616f2d7dacd8f0825dec0"
+    GIT_COMMIT_HASH = "b91c1c13202afa7588431b344b73742d20dce68d"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -52,8 +53,15 @@ class mightymorphingmodels:
         # return variables are: returnVal
         #BEGIN morph_model
         service = Service(self.callback_url, self.workspaceURL, ctx)
-        model = FBAModel(params['fbamodel_id'], params['workspace'])
-        service.remove_reaction(model, reaction='rxn00001_c0', output_id=params['output_id'])
+        required_args = ['fbamodel_id', 'fbamodel_workspace', 'media_id', 'media_workspace']
+        for r in required_args:
+            if r not in params:
+                raise ValueError("insufficient params supplied")
+        model = FBAModel(params['fbamodel_id'], params['fbamodel_workspace'], service=service)
+        media = Media(params['media_id'], params['media_workspace'], service=service)
+        morph = Morph(service=service, src_model=model, media=media, ws_id=params['workspace'])
+        morph.fill_src_to_media()
+
         reportObj = {
             'objects_created':[],
             'text_message':"MIGHTY"
@@ -63,7 +71,7 @@ class mightymorphingmodels:
         if 'provenance' in ctx:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
-        provenance[0]['input_ws_objects']=[params['workspace']+'/'+params['fbamodel_id']]
+        provenance[0]['input_ws_objects'] = [params['workspace']+'/'+params['fbamodel_id']]
         try:
             report_info_list = service.ws_client.save_objects({
                 'workspace': params['workspace'],

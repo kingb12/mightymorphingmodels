@@ -1,8 +1,8 @@
 import random
 
-from lib.fba_tools.fba_toolsClient import fba_tools
-from lib.Workspace.WorkspaceClient import Workspace
-from lib.Workspace.baseclient import ServerError
+from fba_tools.fba_toolsClient import fba_tools
+from Workspace.WorkspaceClient import Workspace
+from Workspace.baseclient import ServerError
 
 # =====================================================================================================================
 # Type Strings From KBase
@@ -76,9 +76,9 @@ class Service:
         """
         result = None
         if name is None:
-            result = self.ws_client.get_objects([{'objid': objid, 'wsid': wsid}])[0]
+            result = self.ws_client.get_objects([{'objid': objid, 'workspace': wsid}])[0]
         else:
-            result = self.ws_client.get_objects([{'name': name, 'wsid': wsid}])[0]
+            result = self.ws_client.get_objects([{'name': name, 'workspace': wsid}])[0]
         return result['data'], result['info']
 
 
@@ -107,7 +107,7 @@ class Service:
         if name is not None:
             sv[u'name'] = name
         info = self.ws_client.save_objects({u'id': wsid, u'objects': [sv]})[0]
-        return info[0], info[6]
+        return info[0], info[7]
 
 
     def list_objects(self, workspace_id, typestr=None):
@@ -119,7 +119,7 @@ class Service:
         :param workspace_id: the workspace to list the objects from
         :return: a list of tuples of objects
         """
-        objects = self.ws_client.list_objects({'ids': [workspace_id]})
+        objects = self.ws_client.list_objects({'workspaces': [workspace_id]})
         result = list()
         for obj in objects:
             object_type = obj[2]
@@ -159,35 +159,30 @@ class Service:
         :param to_tuple: (name, wsid) of the destination. workspace may differ. NOTE NAME IS A STRING
         :return: a tuple with information on the new objectmodel
         """
-        info = self.ws_client.copy_object({'from': {'wsid': from_tuple[1],
+        info = self.ws_client.copy_object({'from': {'workspace': from_tuple[1],
                                                'objid': from_tuple[0]},
-                                      'to': {'wsid': to_tuple[1], 'name': to_tuple[0]}})
-        return info[0], info[6]
+                                      'to': {'workspace': to_tuple[1], 'name': to_tuple[0]}})
+        print info
+        return info[0], info[7]
 
 
-    def gapfill_model(self, model, media, workspace=None, rxn_probs=None):
+    def gapfill_model(self, model, media, workspace=None):
         """
 
         :param model: FBAModel to gapfill
         :param media: Media to gapfill the model to
         :param workspace: destination workspace for new model and gapfill object
-        :param rxn_probs: (optional) ReactionProbabilities for probabilisitc gapfilling
         :param name: (optional) name for new model. KBase will overwrite original if left unspecified.
         :return: the information for a new gap-filled model
         """
-        gap_formulation = {u'formulation': media.fba_formulation()}
         if workspace is None:
             workspace = model.workspace_id
-        if rxn_probs is not None:
-            gap_formulation.update({u'probabilisticAnnotation': rxn_probs.object_id,
-
-                                    u'probabilisticAnnotation_workspace': rxn_probs.workspace_id})
-
-        params = {u'fbamodel_id': str(model.object_id), u'fbamodel_workspace': str(model.workspace_id), u'fbamodel_output_id': str(model.name),
+        params = {u'fbamodel_id': str(model.object_id), u'fbamodel_workspace': str(model.workspace_id),
+                  u'fbamodel_output_id': str(model.name),
                   u'workspace': workspace,
                   u'media_id': media.object_id, u'media_workspace': media.workspace_id,
                   u'comprehensive_gapfill': False}
-        self.fba_client.gapfill_model(params)
+        self.fba_client.gapfill_metabolic_model(params)
         return model.object_id, model.workspace_id
 
 
@@ -228,7 +223,7 @@ class Service:
         fba_params = {u'workspace': workspace, u'model': model.object_id, u'model_workspace': model.workspace_id,
                       u'formulation': self.fba_formulation(media)}
         info = self.fba_client.runfba(fba_params)
-        return info[0], info[6]
+        return info[0], info[7]
 
 
     def runfva(self, model, media, workspace=None):
@@ -245,7 +240,7 @@ class Service:
         fba_params = {u'workspace': workspace, u'model': model.object_id, u'model_workspace': model.workspace_id,
                       u'formulation': self.fba_formulation(media), u'fva': True}
         info = self.fba_client.runfba(fba_params)
-        return info[0], info[6]
+        return info[0], info[7]
 
 
     def translate_model(self, src_model, protcomp, workspace=None):
@@ -262,7 +257,7 @@ class Service:
                         u'model': src_model.object_id, u'model_workspace': src_model.workspace_id,
                         u'workspace': workspace}
         info = self.fba_client.translate_fbamodel(trans_params)
-        return info[0], info[6]
+        return info[0], info[7]
 
 
     def reconstruct_genome(self, genome, workspace=None):
@@ -276,7 +271,7 @@ class Service:
             workspace = genome.workspace_id
         recon_params = {u'genome': genome.object_id, u'genome_workspace': genome.workspace_id, u'workspace': workspace}
         info = self.fba_client.genome_to_fbamodel(recon_params)
-        return info[0], info[6]
+        return info[0], info[7]
 
 
     def remove_reactions_in_place(self, model, reactions_to_remove):
@@ -317,12 +312,12 @@ class Service:
                 i += 1
                 output_id = model.name + '-' + str(i)
 
-        info = self.fba_client.remove_reactions({'model': model.object_id,
-                                            'model_workspace':model.workspace_id,
-                                            'output_id': output_id,
+        info = self.fba_client.edit_metabolic_model({'fbamodel_id': model.object_id,
+                                            'fbamodel_workspace': model.workspace_id,
+                                            'fbamodel_output_id': output_id,
                                             'workspace': model.workspace_id,
-                                            'reactions': [reaction]})
-        return info[0], info[6]
+                                            'reactions_to_remove': [reaction]})
+        return self._parse_objid_from_ref(info['new_fbamodel_ref']), model.workspace_id
 
 
     def add_reactions(self, model, new_reactions, workspace=None, name=None):
@@ -343,7 +338,7 @@ class Service:
         if name is not None:
             args['output_id'] = name
         info = self.fba_client.add_reactions(args)
-        return info[0], info[6]
+        return info[0], info[7]
 
 
     def add_reactions_manually(self, model, reactions, workspace=None, name=None):
@@ -443,3 +438,6 @@ class Service:
                 except ServerError:
                     ws_name += str(random.randint(1, 9))
         return ws_id, ws_name
+
+    def _parse_objid_from_ref(self, ref):
+        return ref.split('/')[1]

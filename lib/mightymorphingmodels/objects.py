@@ -17,13 +17,13 @@ class StoredObject(object):
 
     # The current environment is KBase, where all calls to the API refer to their objects by ids and workspace_ids
 
-    def __init__(self, object_id, workspace_id):
-        self.identity = (int(object_id), int(workspace_id))
+    def __init__(self, object_id, workspace_id, service=None):
+        self.identity = (object_id, workspace_id)
         self._name = None
         self._data = None  # BE MINDFUL OF THIS. IF YOU FIND A BUG CAUSED BY THIS NAMING, CHANGE IT
         self._ver = None
         self._check_rep()
-
+        self.service = service  # Ugly. The service managing this object (has ws client). A refactor can remove this
 
     def __getattr__(self, item):
         # Overriding __getattr__ to  get special objects
@@ -75,7 +75,7 @@ class StoredObject(object):
             raise TypeError("incorrect class. This JSON represents a " + json_dict[TYPE_STR])
         return cls(json_dict[OBJECT_ID], json_dict[WORKSPACE_ID])
 
-    def get_object(self, service):
+    def get_object(self):
         """
         Returns the representation of our object from it's stored environment
         :return dict: the data representing this object
@@ -85,7 +85,7 @@ class StoredObject(object):
         from the interior of the object, it is best to use the abstractions provided by it's more specific type.
         """
         self._check_rep()
-        meta_data = service.get_object(self.object_id, self.workspace_id)
+        meta_data = self.service.get_object(self.object_id, self.workspace_id)
         self._data = meta_data[0]
         self._name = meta_data[1][1]
         self._ver = meta_data[1][4]
@@ -126,8 +126,6 @@ class StoredObject(object):
         """
         pass
 
-
-
     def copy(self, service, workspace_id=None, name=None):
         if name is None and workspace_id is None:
             name = str(self.name) + '_copy'
@@ -135,11 +133,11 @@ class StoredObject(object):
         if name is None:
             name = str(self.name)
         object_id, workspace_id = service.copy_object(self.identity, (name, workspace_id))
-        return self.__class__(object_id, workspace_id)  # TODO: more pragmatic way than unpacking the KBase info_list?
+        return self.__class__(object_id, workspace_id, service=service)  # TODO: more pragmatic way than unpacking the KBase info_list?
 
     def _check_rep(self):
-        a = int(self.object_id)
-        b = int(self.workspace_id)
+        a = self.object_id
+        b = self.workspace_id
         if not (a is not None and b is not None):
             raise RepresentationError(self)
 

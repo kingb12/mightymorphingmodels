@@ -82,7 +82,15 @@ class mightymorphingmodelsTest(unittest.TestCase):
         #                                  'objects': []})
         #
         # Run your method by
-        ret = self.getImpl().your_method(self.getContext(), {"fbamodel_id": "550", "workspace": "10232"})
+        ws = "bking:narrative_1550692997297"
+        params = {
+            "fbamodel_id": "2",
+            "fbamodel_workspace": ws,
+            "media_id": "12",
+            "media_workspace": ws,
+            "workspace": ws
+        }
+        ret = self.getImpl().morph_model(self.getContext(), params)
         #
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods
