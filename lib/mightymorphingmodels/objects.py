@@ -127,11 +127,10 @@ class StoredObject(object):
         pass
 
     def copy(self, service, workspace_id=None, name=None):
-        if name is None and workspace_id is None:
-            name = str(self.name) + '_copy'
-            workspace_id = self.workspace_id
         if name is None:
-            name = str(self.name)
+            name = str(self.name) + '_copy'
+        if workspace_id is None:
+            workspace_id = self.workspace_id
         object_id, workspace_id = service.copy_object(self.identity, (name, workspace_id))
         return self.__class__(object_id, workspace_id, service=service)  # TODO: more pragmatic way than unpacking the KBase info_list?
 
@@ -709,8 +708,8 @@ class FBA(StoredObject):
     """
     storedType = types()['FBA']
 
-    def __init__(self, object_id, workspace_id):
-        super(FBA, self).__init__(object_id, workspace_id)
+    def __init__(self, object_id, workspace_id, service=None):
+        super(FBA, self).__init__(object_id, workspace_id, service=service)
         self.objective = self.get_objective()
 
     def get_objective(self):
@@ -726,7 +725,7 @@ class FBA(StoredObject):
         :return: FBAModel
         """
         info = self.data['fbamodel_ref'].split('/')
-        return FBAModel(info[1], info[0])
+        return FBAModel(info[1], info[0], service=self.service)
 
     def get_media(self):
         """

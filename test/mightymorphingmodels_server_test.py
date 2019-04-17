@@ -84,10 +84,16 @@ class mightymorphingmodelsTest(unittest.TestCase):
         # Run your method by
         ws = "bking:narrative_1550692997297"
         params = {
-            "fbamodel_id": "2",
+            "fbamodel_id": "33",
             "fbamodel_workspace": ws,
+            "proteincomparison_id": "38",
+            "proteincomparison_workspace": ws,
+            "genome_id": "28",
+            "genome_workspace": ws,
             "media_id": "12",
             "media_workspace": ws,
+            "translate_media": False,
+            "num_reactions_to_process": 2,
             "workspace": ws
         }
         ret = self.getImpl().morph_model(self.getContext(), params)

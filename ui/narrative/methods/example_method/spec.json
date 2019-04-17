@@ -22,8 +22,84 @@
             }
         },
         {
-            "id": "output_id",
+            "id": "genome_id",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseGenomes.Genome" ]
+            }
+        },
+        {
+            "id": "media_id",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseBiochem.Media" ]
+            }
+        },
+        {
+            "id": "translate_media_id",
             "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseBiochem.Media" ]
+            }
+        },
+        {
+            "id": "proteincomparison_id",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "GenomeComparison.ProteomeComparison" ]
+            }
+        },
+        {
+            "id": "translate_media",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "0" ],
+            "field_type": "checkbox",
+            "checkbox_options" : {
+                "unchecked_value" : 0,
+                "checked_value" : 1
+            }
+        },
+        {
+            "id": "fill_src",
+            "optional": true,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "0" ],
+            "checkbox_options" : {
+                "unchecked_value" : 0,
+                "checked_value" : 1
+            },
+            "field_type": "checkbox"
+        },
+        {
+            "id": "num_reactions_to_process",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "-1" ],
+            "field_type": "text"
+        },
+        {
+            "id": "output_id",
+            "optional": false,
             "advanced": false,
             "allow_multiple": false,
             "default_values": [ "" ],
@@ -44,8 +120,56 @@
                     "target_property": "workspace"
                 },
                 {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "fbamodel_workspace"
+                },
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "genome_workspace"
+                },
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "media_workspace"
+                },
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "translate_media_workspace"
+                },
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "proteincomparison_workspace"
+                },
+                {
                     "input_parameter": "fbamodel_id",
                     "target_property": "fbamodel_id"
+                },
+                {
+                    "input_parameter": "media_id",
+                    "target_property": "media_id"
+                },
+                {
+                    "input_parameter": "proteincomparison_id",
+                    "target_property": "proteincomparison_id"
+                },
+                {
+                    "input_parameter": "genome_id",
+                    "target_property": "genome_id"
+                },
+                {
+                    "input_parameter": "num_reactions_to_process",
+                    "target_property": "num_reactions_to_process"
+                },
+                {
+                    "input_parameter": "fill_src",
+                    "target_property": "fill_src"
+                },
+                {
+                    "input_parameter": "translate_media",
+                    "target_property": "translate_media"
+                },
+                {
+                    "input_parameter": "translate_media_id",
+                    "target_property": "translate_media_id"
                 },
                 {
                     "input_parameter": "output_id",

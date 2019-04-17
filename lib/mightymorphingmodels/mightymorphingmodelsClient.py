@@ -12,7 +12,7 @@ from __future__ import print_function
 try:
     # baseclient and this client are in a package
     from .baseclient import BaseClient as _BaseClient  # @UnusedImport
-except:
+except ImportError:
     # no they aren't
     from baseclient import BaseClient as _BaseClient  # @Reimport
 
@@ -23,7 +23,7 @@ class mightymorphingmodels(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://kbase.us/services/authorization/Sessions/Login'):
+            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login'):
         if url is None:
             raise ValueError('A url is required')
         self._service_ver = None
@@ -37,14 +37,15 @@ class mightymorphingmodels(object):
         """
         Morph Function
         :param params: instance of type "CallingParams" (Insert your typespec
-           information here.) -> structure: parameter "workspace" of String,
-           parameter "fbamodel_id" of String, parameter "output_id" of String
+           information here.) -> structure: parameter "fbamodel_workspace" of
+           String, parameter "fbamodel_id" of String, parameter
+           "media_workspace" of String, parameter "media_id" of String,
+           parameter "workspace" of String
         :returns: instance of type "CallingResults" -> structure: parameter
            "report_name" of String, parameter "report_ref" of String
         """
-        return self._client.call_method(
-            'mightymorphingmodels.morph_model',
-            [params], self._service_ver, context)
+        return self._client.call_method('mightymorphingmodels.morph_model',
+                                        [params], self._service_ver, context)
 
     def status(self, context=None):
         return self._client.call_method('mightymorphingmodels.status',

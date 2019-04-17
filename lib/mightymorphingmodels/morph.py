@@ -155,12 +155,12 @@ class Morph:
         Gap-fills the Morphs source model to the provided media
         :return: None
         """
-        prev = FBAModel(self.src_model.object_id, self.src_model.workspace_id)
+        prev = FBAModel(self.src_model.object_id, self.src_model.workspace_id, service=self.service)
         print type(self.src_model)
         self.src_model = self.src_model.copy(self.service, workspace_id=self.ws_id)
         result = self.service.gapfill_model(self.src_model, self.media,
                                        workspace=self.ws_id)
-        self.src_model = FBAModel(result[0], result[1], service=self.src_model.service)
+        self.src_model = FBAModel(result[0], result[1], service=self.service)
         self.log.add('gapfill', prev, self.src_model, context='fill_src_to_media')
 
     def runfba(self, model=None, media=None):
@@ -175,7 +175,7 @@ class Morph:
         if media is None:
             media = self.media
         objid, wsid = self.service.runfba(model, media, self.ws_id)
-        return FBA(objid, wsid)
+        return FBA(objid, wsid, service=self.service)
 
     def translate_features(self):
         """
@@ -184,7 +184,7 @@ class Morph:
         """
         prev = copy.deepcopy(self.trans_model)
         result = self.service.translate_model(self.src_model, self.protcomp, workspace=self.ws_id)
-        self.trans_model = FBAModel(result[0], result[1])
+        self.trans_model = FBAModel(result[0], result[1], service=self.service)
         self.log.add('model_translation', prev, self.trans_model, context='translate_features')
 
     def reconstruct_genome(self):
@@ -194,7 +194,7 @@ class Morph:
         """
         prev = copy.deepcopy(self.recon_model)
         result = self.service.reconstruct_genome(self.genome, workspace=self.ws_id)
-        self.recon_model = FBAModel(result[0], result[1])
+        self.recon_model = FBAModel(result[0], result[1], service=self.service)
         self.log.add('genome_reconstruction', prev, self.recon_model, context='reconstruct_genome')
 
     def label_reactions(self):
@@ -301,7 +301,7 @@ class Morph:
                            'recon': dict(),
                            'common': dict()}
         # Some reference sets
-        all_reactions = set(model_dict.keys()).union(recon_dict.keys())  # TODO: runtime will make you cry
+        all_reactions = set(model_dict.keys()).union(recon_dict.keys())
         for rxn in all_reactions:
             if rxn in trans_dict and rxn in recon_dict:
                 self.rxn_labels['common'][rxn] = (trans_dict[rxn], recon_dict[rxn])
@@ -373,9 +373,10 @@ class Morph:
             self.merge_conflicts = []
         src_rxns = dict([(r.rxn_id(), r) for r in self.src_model.get_reactions()])
         super_rxns = dict()
+        super_rxns_full = dict()  # TODO consolidate if manual addition is better
         specials = list()
         # copy the trans model
-        self.model = self.trans_model.copy()
+        self.model = self.trans_model.copy(self.service, workspace_id=self.ws_id)
         #  ---->
         # Adding reactions into the translation.
         # First, go through every reaction they have in common and adjust if
@@ -389,6 +390,7 @@ class Morph:
             if trans_rxn.gpr != merge_gpr or trans_rxn.get_direction() != direction:
                 self.merge_conflicts.append(rxn_id)
                 super_rxns[rxn_id] = (recon_rxn.get_rxn_ref(), recon_rxn.get_comp_ref(), direction, str(merge_gpr))
+                super_rxns_full[rxn_id] = recon_rxn
                 removal_id = trans_rxn.get_removal_id()
                 reactions_to_remove.append(removal_id)
         # ---->
@@ -402,6 +404,7 @@ class Morph:
                 specials.append(reaction)
             else:
                 super_rxns[rxn_id] = (reaction.get_rxn_ref(), reaction.get_comp_ref(), reaction.get_direction())
+                super_rxns_full[rxn_id] = reaction
         adjustments = []
         # Add the RECON reactions:
         for rxn_id in self.rxn_labels['recon']:
@@ -415,14 +418,15 @@ class Morph:
             else:
                 if rxn_id not in super_rxns:
                     super_rxns[rxn_id] = (reaction.get_rxn_ref(), reaction.get_comp_ref(), direction, str(reaction.gpr))
+                    super_rxns_full[rxn_id] = reaction
                     adjustments.append((reaction.get_removal_id(), reaction.gpr))
         # ---->
         super_rxns = super_rxns.values()
-        result = self.service.add_reactions(self.model, super_rxns, name='super_model')
-        self.model = FBAModel(result[0], result[1])
+        result = self.service.add_reactions_manually(self.model, super_rxns_full.values(), name='super_model')
+        self.model = FBAModel(result[0], result[1], service=self.service)
         self.service.adjust_gprs(self.model, adjustments)
         result = self.service.add_reactions_manually(self.model, specials, name='super_modelspc')
-        self.model = FBAModel(result[0], result[1])
+        self.model = FBAModel(result[0], result[1], service=self.service)
 
     def prepare_supermodel(self, fill_src=False):
         """
@@ -538,7 +542,9 @@ class Morph:
         self.build_supermodel()
 
     def process_reactions(self, rxn_list=None, name='', process_count=0, get_count=False, iterative_models=True,
-                          growth_condition=GrowthConditions.SimpleCondition()):
+                          growth_condition=None, num_reactions=-1):
+        if growth_condition is None:
+            growth_condition = GrowthConditions.SimpleCondition(service=self.service)
         """
         Attempts removal of rxn_list reactions from morph (i.e. morph.rxn_labels[label])
 
@@ -640,7 +646,8 @@ class Morph:
         # Give objs a general name if none is provided
         if name == '':
             name = 'MM'
-        for i in range(len(removal_list)):
+        max = num_reactions >= 0 and num_reactions or len(removal_list)
+        for i in range(max):
             removal_id = removal_list[i][1].get_removal_id()
             rxn = removal_list[i][0]
             if removal_id.startswith('rxn00000'):
@@ -650,7 +657,7 @@ class Morph:
             print '\nReaction to remove: ' + str(removal_id) + " / " + str(rxn)
             # TODO Find someway to fix the behavior bug if model_id is not in ws, etc.
             info = self.service.remove_reaction(self.model, removal_id, output_id=name + '-' + str(process_count))
-            new_model = FBAModel(info[0], info[1])
+            new_model = FBAModel(info[0], info[1], service=self.service)
             if iterative_models:
                 process_count += 1
             if growth_condition.evaluate({'morph': self, 'model': new_model}):
@@ -674,6 +681,9 @@ class Morph:
         returns the probanno likelihood for a reaction in a morph
         '''
         #TODO: Will Users ever have their own probannos? YES
+        if self.probanno is None:
+            # This means probabilistic annotations are not required, but used if present
+            return -1.0
         if self.probhash is None:
             self.probhash = self.probanno.probability_hash()
         try:
@@ -689,8 +699,8 @@ class Morph:
         self.media = new_media
         if not self.runfba().objective > 0:
             prev_rxns = set(([r.rxn_id() for r in self.model.get_reactions()]))
-            info = self.service.gapfill_model(self.model, self.media, workspace=self.ws_id, rxn_probs=self.probanno)
-            filled_model = FBAModel(info[0], info[1])
+            info = self.service.gapfill_model(self.model, self.media, workspace=self.ws_id)
+            filled_model = FBAModel(info[0], info[1], service=self.service)
             filled_rxns = dict([(r.rxn_id(), r) for r in filled_model.get_reactions()])
             new_reactions = set(filled_rxns.keys()) - prev_rxns
             for r in new_reactions:

@@ -24,7 +24,7 @@ class mightymorphingmodels:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kingb12/mightymorphingmodels.git"
-    GIT_COMMIT_HASH = "b91c1c13202afa7588431b344b73742d20dce68d"
+    GIT_COMMIT_HASH = "8836167bd482c87a2e694177f6153b66dfb7acbe"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -44,8 +44,10 @@ class mightymorphingmodels:
         """
         Morph Function
         :param params: instance of type "CallingParams" (Insert your typespec
-           information here.) -> structure: parameter "workspace" of String,
-           parameter "fbamodel_id" of String, parameter "output_id" of String
+           information here.) -> structure: parameter "fbamodel_workspace" of
+           String, parameter "fbamodel_id" of String, parameter
+           "media_workspace" of String, parameter "media_id" of String,
+           parameter "workspace" of String
         :returns: instance of type "CallingResults" -> structure: parameter
            "report_name" of String, parameter "report_ref" of String
         """
@@ -53,18 +55,47 @@ class mightymorphingmodels:
         # return variables are: returnVal
         #BEGIN morph_model
         service = Service(self.callback_url, self.workspaceURL, ctx)
-        required_args = ['fbamodel_id', 'fbamodel_workspace', 'media_id', 'media_workspace']
+        required_args = ['fbamodel_id',
+                         'fbamodel_workspace',
+                         'media_id',
+                         'media_workspace',
+                         'proteincomparison_id',
+                         'proteincomparison_workspace',
+                         'genome_id',
+                         'genome_workspace']
         for r in required_args:
             if r not in params:
                 raise ValueError("insufficient params supplied")
         model = FBAModel(params['fbamodel_id'], params['fbamodel_workspace'], service=service)
         media = Media(params['media_id'], params['media_workspace'], service=service)
-        morph = Morph(service=service, src_model=model, media=media, ws_id=params['workspace'])
-        morph.fill_src_to_media()
+        protcomp = ProteomeComparison(params['proteincomparison_id'], params['proteincomparison_workspace'])
+        genome = Genome(params['genome_id'], params['genome_workspace'], service=service)
+        morph = Morph(service=service,
+                      src_model=model,
+                      media=media,
+                      protcomp=protcomp,
+                      genome=genome,
+                      ws_id=params['workspace'])
+        if 'fill_src' in params and params['fill_src']:
+            morph.fill_src_to_media()
+        morph.translate_features()
+        morph.reconstruct_genome()
+        morph.label_reactions()
+        morph.build_supermodel()
+        if 'translate_media' in params and params['translate_media']:
+            if 'target_media_id' in params and 'target_media_workspace' in params:
+                new_media = Media(params['target_media_id'], params['target_media_workspace'], service=service)
+            else:
+                new_media = morph.media
+            morph.translate_media(new_media)
+        if 'num_reactions_to_process' in params:
+            morph.process_reactions(num_reactions=params['num_reactions_to_process'])
+        else:
+            morph.process_reactions()
 
         reportObj = {
             'objects_created':[],
-            'text_message':"MIGHTY"
+            'text_message': "MIGHTY"
         }
         #save report
         provenance = [{}]
