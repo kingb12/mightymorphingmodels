@@ -36,6 +36,55 @@ parameters :
             FBA Model for FBA
         long-hint  : |
             FBA Model for FBA
+    genome_id:
+        ui-name: |
+            Target Genome
+        short-hint: |
+            Genome to morph to
+        long-hint: |
+            Genome to morph to
+    proteincomparison_id:
+        ui-name: |
+            Proteome Comparison
+        short-hint: |
+            Proteome Comparison
+        long-hint: |
+            Proteome Comparison between source and target genome
+    media_id:
+        ui-name: |
+            Media
+        short-hint: |
+            Growth media
+        long-hint: |
+            Growth media for output FBA model
+    translate_media_id:
+        ui-name: |
+            Translate Media
+        short-hint: |
+            Growth media
+        long-hint: |
+            edia for target organism (differs from source)
+    translate_media:
+        ui-name: |
+            Translate Media?
+        short-hint: |
+            Translate media to target?
+        long-hint: |
+            Translate media to target?
+    fill_src:
+        ui-name: |
+            Gapfill Source?
+        short-hint: |
+            Gapfill Source Model?
+        long-hint: |
+            Gapfill Source Model before beginning? (best if no growth in current source model)
+    num_reactions_to_process:
+        ui-name: |
+            Num Reactions
+        short-hint: |
+            Number of reactions to process
+        long-hint: |
+            Number of reactions to process (defaults to all)
     output_id :
         ui-name : |
             FBAModel output

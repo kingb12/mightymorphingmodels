@@ -122,9 +122,11 @@ sub new
 $params is a mightymorphingmodels.CallingParams
 $return is a mightymorphingmodels.CallingResults
 CallingParams is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
+	fbamodel_workspace has a value which is a string
 	fbamodel_id has a value which is a string
-	output_id has a value which is a string
+	media_workspace has a value which is a string
+	media_id has a value which is a string
+	workspace has a value which is a string
 CallingResults is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
@@ -138,9 +140,11 @@ CallingResults is a reference to a hash where the following keys are defined:
 $params is a mightymorphingmodels.CallingParams
 $return is a mightymorphingmodels.CallingResults
 CallingParams is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
+	fbamodel_workspace has a value which is a string
 	fbamodel_id has a value which is a string
-	output_id has a value which is a string
+	media_workspace has a value which is a string
+	media_id has a value which is a string
+	workspace has a value which is a string
 CallingResults is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
 	report_ref has a value which is a string
@@ -308,9 +312,11 @@ Insert your typespec information here.
 
 <pre>
 a reference to a hash where the following keys are defined:
-workspace has a value which is a string
+fbamodel_workspace has a value which is a string
 fbamodel_id has a value which is a string
-output_id has a value which is a string
+media_workspace has a value which is a string
+media_id has a value which is a string
+workspace has a value which is a string
 
 </pre>
 
@@ -319,9 +325,11 @@ output_id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-workspace has a value which is a string
+fbamodel_workspace has a value which is a string
 fbamodel_id has a value which is a string
-output_id has a value which is a string
+media_workspace has a value which is a string
+media_id has a value which is a string
+workspace has a value which is a string
 
 
 =end text

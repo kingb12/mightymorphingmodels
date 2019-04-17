@@ -1,4 +1,4 @@
-import service
+from service import Service
 import objects
 
 class AbstractGrowthCondition:
@@ -17,8 +17,9 @@ class AbstractGrowthCondition:
     This SimpleCondition keeps all reactions that are absolutely necessary for the models growth
     """
 
-    def __init__(self):
+    def __init__(self, service=None):
         self.fba = None
+        self.service = service
 
     def evaluate(self, arguments):
         raise NotImplementedError()
@@ -36,8 +37,8 @@ class SimpleCondition(AbstractGrowthCondition):
     def evaluate(self, arguments):
         morph = arguments['morph']
         model = arguments['model'] if 'model' in arguments else morph.model
-        info = service.runfba(model, morph.media, workspace=morph.ws_id)
-        self.fba = objects.FBA(info[0], info[1])
+        info = self.service.runfba(model, morph.media, workspace=morph.ws_id)
+        self.fba = objects.FBA(info[0], info[1], service=self.service)
         return self.fba.objective > 0.0
 
 
@@ -49,8 +50,8 @@ class BarkeriCondition(AbstractGrowthCondition):
         raise NotImplementedError()
         morph = arguments['morph']
         model = arguments['model'] if 'model' in arguments else morph.model
-        info = service.runfba(model, morph.media, workspace=morph.ws_id)
-        fba = objects.FBA(info[0], info[1])
+        info = self.service.runfba(model, morph.media, workspace=morph.ws_id)
+        fba = objects.FBA(info[0], info[1], service=self.service)
 
 
 class AllMedia(AbstractGrowthCondition):
@@ -65,8 +66,8 @@ class AllMedia(AbstractGrowthCondition):
         for med in self.media:
             morph = args['morph']
             model = args['model'] if 'model' in args else morph.model
-            info = service.runfba(model, med, workspace=morph.ws_id)
-            fba = objects.FBA(info[0], info[1])
+            info = self.service.runfba(model, med, workspace=morph.ws_id)
+            fba = objects.FBA(info[0], info[1], service=self.service)
             self.fba = fba
             if not fba.objective > 0.0:
                 return False
