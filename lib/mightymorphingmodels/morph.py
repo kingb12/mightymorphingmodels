@@ -541,7 +541,7 @@ class Morph:
         self.label_reactions()
         self.build_supermodel()
 
-    def process_reactions(self, rxn_list=None, name='', process_count=0, get_count=False, iterative_models=True,
+    def process_reactions(self, rxn_list=None, name=None, get_count=False, iterative_models=True,
                           growth_condition=None, num_reactions=-1):
         if growth_condition is None:
             growth_condition = GrowthConditions.SimpleCondition(service=self.service)
@@ -644,15 +644,14 @@ class Morph:
         if self.removed_ids is None:
             self.removed_ids = dict()
         # Give objs a general name if none is provided
-        if name == '':
-            name = 'MM'
+        if name is None:
+            name = 'MorphedModel'
         max = num_reactions >= 0 and num_reactions or len(removal_list)
         for i in range(max):
             removal_id = removal_list[i][1].get_removal_id()
             rxn = removal_list[i][0]
             if removal_id.startswith('rxn00000'):
-                self.log.add('skip', [self.model, removal_list[i][1]], [None], context='process_reactions',
-                             notes=str([process_count]))
+                self.log.add('skip', [self.model, removal_list[i][1]], [None], context='process_reactions')
                 continue
             print '\nReaction to remove: ' + str(removal_id) + " / " + str(rxn)
             # TODO Find someway to fix the behavior bug if model_id is not in ws, etc.

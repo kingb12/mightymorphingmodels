@@ -45,8 +45,8 @@ class mightymorphingmodels:
         Morph Function
         :param params: instance of type "CallingParams" (Insert your typespec
            information here.) -> structure: parameter "fbamodel_workspace" of
-           String, parameter "fbamodel_id" of String, parameter
-           "media_workspace" of String, parameter "media_id" of String,
+           String, parameter "fbamodel_name" of String, parameter
+           "media_workspace" of String, parameter "media_name" of String,
            parameter "workspace" of String
         :returns: instance of type "CallingResults" -> structure: parameter
            "report_name" of String, parameter "report_ref" of String
@@ -54,23 +54,32 @@ class mightymorphingmodels:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN morph_model
-        service = Service(self.callback_url, self.workspaceURL, ctx)
-        required_args = ['fbamodel_id',
+        self.service = Service(self.callback_url, self.workspaceURL, ctx)
+        required_args = ['fbamodel_name',
                          'fbamodel_workspace',
-                         'media_id',
+                         'media_name',
                          'media_workspace',
-                         'proteincomparison_id',
+                         'proteincomparison_name',
                          'proteincomparison_workspace',
-                         'genome_id',
+                         'genome_name',
                          'genome_workspace']
         for r in required_args:
             if r not in params:
                 raise ValueError("insufficient params supplied")
-        model = FBAModel(params['fbamodel_id'], params['fbamodel_workspace'], service=service)
-        media = Media(params['media_id'], params['media_workspace'], service=service)
-        protcomp = ProteomeComparison(params['proteincomparison_id'], params['proteincomparison_workspace'])
-        genome = Genome(params['genome_id'], params['genome_workspace'], service=service)
-        morph = Morph(service=service,
+
+
+        def _translate_obj_identity(workspace, name):
+            info = self.service.get_info(workspace, name=name)
+            return info[0], workspace
+        objid, ws = _translate_obj_identity(params['fbamodel_workspace'], params['fbamodel_name'])
+        model = FBAModel(objid, ws, service=self.service)
+        objid, ws = _translate_obj_identity(params['media_workspace'], params['media_name'])
+        media = Media(objid, ws, service=self.service)
+        objid, ws = _translate_obj_identity(params['proteincomparison_workspace'], params['proteincomparison_name'])
+        protcomp = ProteomeComparison(objid, ws, service=self.service)
+        objid, ws = _translate_obj_identity(params['genome_workspace'], params['genome_name'])
+        genome = Genome(objid, ws, service=self.service)
+        morph = Morph(service=self.service,
                       src_model=model,
                       media=media,
                       protcomp=protcomp,
@@ -83,8 +92,9 @@ class mightymorphingmodels:
         morph.label_reactions()
         morph.build_supermodel()
         if 'translate_media' in params and params['translate_media']:
-            if 'target_media_id' in params and 'target_media_workspace' in params:
-                new_media = Media(params['target_media_id'], params['target_media_workspace'], service=service)
+            if 'target_media_name' in params and 'target_media_workspace' in params:
+                objid, ws = self._translate_obj_identity(params['target_media_workspace'], params['target_media_name'])
+                new_media = Media(objid, ws, service=self.service)
             else:
                 new_media = morph.media
             morph.translate_media(new_media)
@@ -102,9 +112,9 @@ class mightymorphingmodels:
         if 'provenance' in ctx:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference
-        provenance[0]['input_ws_objects'] = [params['workspace']+'/'+params['fbamodel_id']]
+        provenance[0]['input_ws_objects'] = [params['workspace']+'/'+params['fbamodel_name']]
         try:
-            report_info_list = service.ws_client.save_objects({
+            report_info_list = self.service.ws_client.save_objects({
                 'workspace': params['workspace'],
                 'objects': [
                     {

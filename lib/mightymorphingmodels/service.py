@@ -82,11 +82,11 @@ class Service:
         return result['data'], result['info']
 
 
-    def get_info(self, objid, wsid, name=None):
+    def get_info(self, wsid, objid=None, name=None):
         if name is None:
-            return self.ws_client.get_object_info_new({'objects': [{'objid': objid, 'wsid': wsid}]})[0]
+            return self.ws_client.get_object_info_new({'objects': [{'objid': objid, 'workspace': wsid}]})[0]
         else:
-            return self.ws_client.get_objects_info_new({'objects': [{'name': name, 'wsid': wsid}]})[0]
+            return self.ws_client.get_object_info_new({'objects': [{'name': name, 'workspace': wsid}]})[0]
 
 
     def save_object(self, data, type, wsid, objid=None, name=None):
