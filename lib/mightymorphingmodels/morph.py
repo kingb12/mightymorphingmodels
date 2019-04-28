@@ -728,7 +728,9 @@ def _general_direction(model_rxn1, model_rxn2):
     elif r1d == '=' or r2d == '=':
         return '='
     else:
-        raise Exception('directions are incompatible')
+        raise Exception('directions are incompatible: ' + str(model_rxn1.get_rxn_ref()) + ' ' +
+                        str(model_rxn2.get_rxn_ref()) + ' ' + str(model_rxn1.get_equation()) + ' /// '
+                        + str(model_rxn2.get_equation()))
 
 
 class RepresentationError(Exception):
