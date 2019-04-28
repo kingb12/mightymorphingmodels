@@ -24,7 +24,7 @@ class mightymorphingmodels:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/kingb12/mightymorphingmodels.git"
-    GIT_COMMIT_HASH = "8836167bd482c87a2e694177f6153b66dfb7acbe"
+    GIT_COMMIT_HASH = "7b416108e6c72e521a1d2d69974b7ebe951fe197"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -45,8 +45,15 @@ class mightymorphingmodels:
         Morph Function
         :param params: instance of type "CallingParams" (Insert your typespec
            information here.) -> structure: parameter "fbamodel_workspace" of
-           String, parameter "fbamodel_name" of String, parameter
-           "media_workspace" of String, parameter "media_name" of String,
+           String, parameter "fbamodel_id" of String, parameter
+           "media_workspace" of String, parameter "media_id" of String,
+           parameter "genome_workspace" of String, parameter "genome_id" of
+           String, parameter "proteincomparison_workspace" of String,
+           parameter "proteincomparison_id" of String, parameter "fill_src"
+           of Long, parameter "translate_media" of Long, parameter
+           "num_reactions_to_process" of Long, parameter
+           "translate_media_workspace" of String, parameter
+           "translate_media_id" of String, parameter "output_id" of String,
            parameter "workspace" of String
         :returns: instance of type "CallingResults" -> structure: parameter
            "report_name" of String, parameter "report_ref" of String

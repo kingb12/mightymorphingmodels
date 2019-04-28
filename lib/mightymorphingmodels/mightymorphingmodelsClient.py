@@ -40,6 +40,13 @@ class mightymorphingmodels(object):
            information here.) -> structure: parameter "fbamodel_workspace" of
            String, parameter "fbamodel_id" of String, parameter
            "media_workspace" of String, parameter "media_id" of String,
+           parameter "genome_workspace" of String, parameter "genome_id" of
+           String, parameter "proteincomparison_workspace" of String,
+           parameter "proteincomparison_id" of String, parameter "fill_src"
+           of Long, parameter "translate_media" of Long, parameter
+           "num_reactions_to_process" of Long, parameter
+           "translate_media_workspace" of String, parameter
+           "translate_media_id" of String, parameter "output_id" of String,
            parameter "workspace" of String
         :returns: instance of type "CallingResults" -> structure: parameter
            "report_name" of String, parameter "report_ref" of String

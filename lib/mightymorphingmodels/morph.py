@@ -156,7 +156,6 @@ class Morph:
         :return: None
         """
         prev = FBAModel(self.src_model.object_id, self.src_model.workspace_id, service=self.service)
-        print type(self.src_model)
         self.src_model = self.src_model.copy(self.service, workspace_id=self.ws_id)
         result = self.service.gapfill_model(self.src_model, self.media,
                                        workspace=self.ws_id)
@@ -541,8 +540,7 @@ class Morph:
         self.label_reactions()
         self.build_supermodel()
 
-    def process_reactions(self, rxn_list=None, name=None, get_count=False, iterative_models=True,
-                          growth_condition=None, num_reactions=-1):
+    def process_reactions(self, rxn_list=None, name=None, growth_condition=None, num_reactions=-1):
         if growth_condition is None:
             growth_condition = GrowthConditions.SimpleCondition(service=self.service)
         """
@@ -633,9 +631,7 @@ class Morph:
             removal_list = sorted(rxn_dict.items(), key=get_key)
             rxn_dict = self.rxn_labels['no-gene']
             removal_list += sorted(rxn_dict.items(), key=get_key)
-            # print "pre-filter: " + str(len(removal_list))
             removal_list = [r for r in removal_list if r[0] not in self.rxn_labels['common']]
-            # print "post-filter: " + str(len(removal_list))
         else:
             removal_list = rxn_list
         # instantiate lists only if needed
@@ -655,10 +651,8 @@ class Morph:
                 continue
             print '\nReaction to remove: ' + str(removal_id) + " / " + str(rxn)
             # TODO Find someway to fix the behavior bug if model_id is not in ws, etc.
-            info = self.service.remove_reaction(self.model, removal_id, output_id=name + '-' + str(process_count))
+            info = self.service.remove_reaction(self.model, removal_id, output_id=name)
             new_model = FBAModel(info[0], info[1], service=self.service)
-            if iterative_models:
-                process_count += 1
             if growth_condition.evaluate({'morph': self, 'model': new_model}):
                 # removed successfully
                 self.log.add('Removed Reaction', [self.model, growth_condition.fba], [new_model],
@@ -671,8 +665,6 @@ class Morph:
                              context='process reactions')
                 self.essential_ids[removal_id] = removal_list[i][1]
             print self.log.actions[-1].type + ' ' + str(removal_id) + ', FBA was ' + str(growth_condition.fba.objective)
-        if get_count:
-            return self, process_count
         return self
 
     def get_prob(self, rxn_id):

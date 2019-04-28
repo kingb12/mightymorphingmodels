@@ -126,6 +126,16 @@ CallingParams is a reference to a hash where the following keys are defined:
 	fbamodel_id has a value which is a string
 	media_workspace has a value which is a string
 	media_id has a value which is a string
+	genome_workspace has a value which is a string
+	genome_id has a value which is a string
+	proteincomparison_workspace has a value which is a string
+	proteincomparison_id has a value which is a string
+	fill_src has a value which is an int
+	translate_media has a value which is an int
+	num_reactions_to_process has a value which is an int
+	translate_media_workspace has a value which is a string
+	translate_media_id has a value which is a string
+	output_id has a value which is a string
 	workspace has a value which is a string
 CallingResults is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -144,6 +154,16 @@ CallingParams is a reference to a hash where the following keys are defined:
 	fbamodel_id has a value which is a string
 	media_workspace has a value which is a string
 	media_id has a value which is a string
+	genome_workspace has a value which is a string
+	genome_id has a value which is a string
+	proteincomparison_workspace has a value which is a string
+	proteincomparison_id has a value which is a string
+	fill_src has a value which is an int
+	translate_media has a value which is an int
+	num_reactions_to_process has a value which is an int
+	translate_media_workspace has a value which is a string
+	translate_media_id has a value which is a string
+	output_id has a value which is a string
 	workspace has a value which is a string
 CallingResults is a reference to a hash where the following keys are defined:
 	report_name has a value which is a string
@@ -316,6 +336,16 @@ fbamodel_workspace has a value which is a string
 fbamodel_id has a value which is a string
 media_workspace has a value which is a string
 media_id has a value which is a string
+genome_workspace has a value which is a string
+genome_id has a value which is a string
+proteincomparison_workspace has a value which is a string
+proteincomparison_id has a value which is a string
+fill_src has a value which is an int
+translate_media has a value which is an int
+num_reactions_to_process has a value which is an int
+translate_media_workspace has a value which is a string
+translate_media_id has a value which is a string
+output_id has a value which is a string
 workspace has a value which is a string
 
 </pre>
@@ -329,6 +359,16 @@ fbamodel_workspace has a value which is a string
 fbamodel_id has a value which is a string
 media_workspace has a value which is a string
 media_id has a value which is a string
+genome_workspace has a value which is a string
+genome_id has a value which is a string
+proteincomparison_workspace has a value which is a string
+proteincomparison_id has a value which is a string
+fill_src has a value which is an int
+translate_media has a value which is an int
+num_reactions_to_process has a value which is an int
+translate_media_workspace has a value which is a string
+translate_media_id has a value which is a string
+output_id has a value which is a string
 workspace has a value which is a string
 
 

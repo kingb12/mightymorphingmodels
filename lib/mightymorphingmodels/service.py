@@ -162,7 +162,6 @@ class Service:
         info = self.ws_client.copy_object({'from': {'workspace': from_tuple[1],
                                                'objid': from_tuple[0]},
                                       'to': {'workspace': to_tuple[1], 'name': to_tuple[0]}})
-        print info
         return info[0], info[7]
 
 
