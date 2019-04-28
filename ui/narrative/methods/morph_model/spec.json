@@ -11,7 +11,7 @@
     },
     "parameters": [
         {
-            "id": "fbamodel_id",
+            "id": "fbamodel_name",
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
@@ -22,7 +22,7 @@
             }
         },
         {
-            "id": "genome_id",
+            "id": "genome_name",
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
@@ -33,7 +33,7 @@
             }
         },
         {
-            "id": "media_id",
+            "id": "media_name",
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
@@ -44,7 +44,7 @@
             }
         },
         {
-            "id": "translate_media_id",
+            "id": "translate_media_name",
             "optional": true,
             "advanced": true,
             "allow_multiple": false,
@@ -55,7 +55,7 @@
             }
         },
         {
-            "id": "proteincomparison_id",
+            "id": "proteincomparison_name",
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
@@ -98,7 +98,7 @@
             "field_type": "text"
         },
         {
-            "id": "output_id",
+            "id": "output_name",
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
@@ -140,20 +140,20 @@
                     "target_property": "proteincomparison_workspace"
                 },
                 {
-                    "input_parameter": "fbamodel_id",
-                    "target_property": "fbamodel_id"
+                    "input_parameter": "fbamodel_name",
+                    "target_property": "fbamodel_name"
                 },
                 {
-                    "input_parameter": "media_id",
-                    "target_property": "media_id"
+                    "input_parameter": "media_name",
+                    "target_property": "media_name"
                 },
                 {
-                    "input_parameter": "proteincomparison_id",
-                    "target_property": "proteincomparison_id"
+                    "input_parameter": "proteincomparison_name",
+                    "target_property": "proteincomparison_name"
                 },
                 {
-                    "input_parameter": "genome_id",
-                    "target_property": "genome_id"
+                    "input_parameter": "genome_name",
+                    "target_property": "genome_name"
                 },
                 {
                     "input_parameter": "num_reactions_to_process",
@@ -168,12 +168,12 @@
                     "target_property": "translate_media"
                 },
                 {
-                    "input_parameter": "translate_media_id",
-                    "target_property": "translate_media_id"
+                    "input_parameter": "translate_media_name",
+                    "target_property": "translate_media_name"
                 },
                 {
-                    "input_parameter": "output_id",
-                    "target_property": "output_id"
+                    "input_parameter": "output_name",
+                    "target_property": "output_name"
                 }
             ],
             "output_mapping": [

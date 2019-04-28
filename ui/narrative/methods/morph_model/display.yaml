@@ -29,35 +29,35 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-    fbamodel_id :
+    fbamodel_name :
         ui-name : |
             FBA Model
         short-hint : |
             FBA Model for FBA
         long-hint  : |
             FBA Model for FBA
-    genome_id:
+    genome_name:
         ui-name: |
             Target Genome
         short-hint: |
             Genome to morph to
         long-hint: |
             Genome to morph to
-    proteincomparison_id:
+    proteincomparison_name:
         ui-name: |
             Proteome Comparison
         short-hint: |
             Proteome Comparison
         long-hint: |
             Proteome Comparison between source and target genome
-    media_id:
+    media_name:
         ui-name: |
             Media
         short-hint: |
             Growth media
         long-hint: |
             Growth media for output FBA model
-    translate_media_id:
+    translate_media_name:
         ui-name: |
             Translate Media
         short-hint: |
@@ -85,7 +85,7 @@ parameters :
             Number of reactions to process
         long-hint: |
             Number of reactions to process (defaults to all)
-    output_id :
+    output_name :
         ui-name : |
             FBAModel output
         short-hint : |
