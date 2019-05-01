@@ -86,9 +86,14 @@ class mightymorphingmodels:
         protcomp = ProteomeComparison(objid, ws, service=self.service)
         objid, ws = _translate_obj_identity(params['genome_workspace'], params['genome_name'])
         genome = Genome(objid, ws, service=self.service)
+        probanno = None
+        if 'rxn_probs_name' in params and 'rxn_probs_workspace' in params:
+            objid, ws = _translate_obj_identity(params['rxn_probs_workspace'], params['rxn_probs_name'])
+            probanno = ReactionProbabilities(objid, ws, service=self.service)
         morph = Morph(service=self.service,
                       src_model=model,
                       media=media,
+                      probanno=probanno,
                       protcomp=protcomp,
                       genome=genome,
                       ws_id=params['workspace'])

@@ -66,6 +66,17 @@
             }
         },
         {
+            "id": "rxn_probs_name",
+            "optional": true,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseFBA.ReactionProbabilities" ]
+            }
+        },
+        {
             "id": "translate_media",
             "optional": true,
             "advanced": true,
@@ -144,6 +155,10 @@
                     "target_property": "proteincomparison_workspace"
                 },
                 {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "rxn_probs_workspace"
+                },
+                {
                     "input_parameter": "fbamodel_name",
                     "target_property": "fbamodel_name"
                 },
@@ -154,6 +169,10 @@
                 {
                     "input_parameter": "proteincomparison_name",
                     "target_property": "proteincomparison_name"
+                },
+                {
+                    "input_parameter": "rxn_probs_name",
+                    "target_property": "rxn_probs_name"
                 },
                 {
                     "input_parameter": "genome_name",

@@ -50,6 +50,13 @@ parameters :
             Proteome Comparison
         long-hint: |
             Proteome Comparison between source and target genome
+    rxn_probs_name:
+        ui-name: |
+            Reaction Probabilities
+            short-hint: |
+            Reaction Probabilities
+            long-hint: |
+            ReactionProbabilities for the target genome
     media_name:
         ui-name: |
             Media
