@@ -93,7 +93,7 @@ class mightymorphingmodelsTest(unittest.TestCase):
             "media_name": "MR1_Minimal_Media",
             "media_workspace": ws,
             "translate_media": False,
-            "num_reactions_to_process": 2,
+            "num_reactions_to_process": "2",
             "workspace": ws
         }
         ret = self.getImpl().morph_model(self.getContext(), params)
