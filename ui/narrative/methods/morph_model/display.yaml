@@ -53,9 +53,9 @@ parameters :
     rxn_probs_name:
         ui-name: |
             Reaction Probabilities
-            short-hint: |
+        short-hint: |
             Reaction Probabilities
-            long-hint: |
+        long-hint: |
             ReactionProbabilities for the target genome
     media_name:
         ui-name: |
