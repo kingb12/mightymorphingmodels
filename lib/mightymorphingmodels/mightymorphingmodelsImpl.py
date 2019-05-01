@@ -87,7 +87,8 @@ class mightymorphingmodels:
         objid, ws = _translate_obj_identity(params['genome_workspace'], params['genome_name'])
         genome = Genome(objid, ws, service=self.service)
         probanno = None
-        if 'rxn_probs_name' in params and 'rxn_probs_workspace' in params:
+        if 'rxn_probs_name' in params and 'rxn_probs_workspace' in params and \
+                params['rxn_probs_name'] is not None and len(params['rxn_probs_name']) > 0:
             objid, ws = _translate_obj_identity(params['rxn_probs_workspace'], params['rxn_probs_name'])
             probanno = ReactionProbabilities(objid, ws, service=self.service)
         morph = Morph(service=self.service,
