@@ -106,7 +106,7 @@ class mightymorphingmodels:
                 new_media = morph.media
             morph.translate_media(new_media)
         if 'num_reactions_to_process' in params:
-            morph.process_reactions(num_reactions=params['num_reactions_to_process'])
+            morph.process_reactions(num_reactions=int(params['num_reactions_to_process']))
         else:
             morph.process_reactions()
 
