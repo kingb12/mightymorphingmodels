@@ -826,8 +826,8 @@ class ReactionProbabilities(StoredObject):
     """
     storedType = types()['ReactionProbabilities']
 
-    def __init__(self, object_id, workspace_id):
-        super(ReactionProbabilities, self).__init__(object_id, workspace_id)
+    def __init__(self, object_id, workspace_id, service=None):
+        super(ReactionProbabilities, self).__init__(object_id, workspace_id, service=service)
         self._prob_hash = None
 
     def probability_hash(self):
