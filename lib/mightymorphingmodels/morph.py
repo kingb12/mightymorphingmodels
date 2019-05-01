@@ -723,16 +723,10 @@ def _general_direction(model_rxn1, model_rxn2):
     """
     r1d = model_rxn1.get_direction()
     r2d = model_rxn2.get_direction()
-    eq = {'=',  '<=>'}
     if r1d == r2d:
         return r1d
-    elif r1d in eq or r2d in eq:
-        return '<=>'
     else:
-        raise Exception('directions are incompatible: ' + str(model_rxn1.get_rxn_ref()) + ' ' +
-                        str(model_rxn2.get_rxn_ref()) + ' ' + str(model_rxn1.get_equation()) + ' /// '
-                        + str(model_rxn2.get_equation()))
-
+        return '<=>'
 
 class RepresentationError(Exception):
     def __init__(self, value):
