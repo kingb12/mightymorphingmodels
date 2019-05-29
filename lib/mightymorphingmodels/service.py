@@ -74,11 +74,10 @@ class Service:
         :param objid: the id of the object to be retrieved
 
         """
-        result = None
         if name is None:
-            result = self.ws_client.get_objects([{'objid': objid, 'workspace': wsid}])[0]
+            result = self.ws_client.get_objects2({'objects': [{'objid': objid, 'workspace': wsid}]})['data'][0]
         else:
-            result = self.ws_client.get_objects([{'name': name, 'workspace': wsid}])[0]
+            result = self.ws_client.get_objects2({'objects': [{'name': name, 'workspace': wsid}]})[0]
         return result['data'], result['info']
 
 
@@ -283,13 +282,16 @@ class Service:
         recon_params = {u'genome_id': genome.object_id,
                         u'genome_workspace': genome.workspace_id,
                         u'fbamodel_output_id': 'recon_' + genome.name,
-                        u'gapfill_model': False,
+                        u'gapfill_model': True,  # TODO parameterize as option
                         u'workspace': workspace}
         info = self.fba_client.build_metabolic_model(recon_params)
-        # references returned here are inconsistent from other fba_tools APIs. Fetch ovject info from ws service
+        # references returned here are sometimes inconsistent from other fba_tools APIs. Fetch obj info from ws service
         obj_name = info['new_fbamodel_ref'].split('/')[1]
-        ws_object_info = self.ws_client.get_object_info_new({'objects': [{'name': obj_name, 'workspace': workspace}]})[0]
-        return ws_object_info[0], workspace
+        try:
+            return int(obj_name), workspace
+        except ValueError:
+            ws_object_info = self.ws_client.get_object_info_new({'objects': [{'name': obj_name, 'workspace': workspace}]})[0]
+            return ws_object_info[0], workspace
 
 
     def remove_reactions_in_place(self, model, reactions_to_remove):
@@ -302,12 +304,12 @@ class Service:
         :param reactions_to_remove: reactions to remove (removal_id's)
         :return:
         """
-        removal_args = {'fbamodel_id': model.object_id,
-                        'fbamodel_workspace': model.workspace_id,
-                        'fbamodel_output_id': model.name,
-                        'workspace': model.workspace_id,
-                        'reactions_to_remove': reactions_to_remove}
-        self.fba_client.edit_metabolic_model(removal_args)
+        model_data, model_info = self.get_object(model.object_id, model.workspace_id)
+        for i, r in enumerate(model_data['modelreactions']):
+            if r['id'] in reactions_to_remove:
+                # remove in json and save
+                del model_data['modelreactions'][i]
+        return self.save_object(model_data, model_info[2], model.workspace_id, name=model.name)
 
 
     def remove_reaction(self, model, reaction, output_id=None, in_place=False):
@@ -331,12 +333,12 @@ class Service:
                 i += 1
                 output_id = model.name + '-' + str(i)
 
-        info = self.fba_client.edit_metabolic_model({'fbamodel_id': model.object_id,
-                                            'fbamodel_workspace': model.workspace_id,
-                                            'fbamodel_output_id': output_id,
-                                            'workspace': model.workspace_id,
-                                            'reactions_to_remove': [reaction]})
-        return self._parse_objid_from_ref(info['new_fbamodel_ref']), model.workspace_id
+        model_data, model_info = self.get_object(model.object_id, model.workspace_id)
+        for i, r in enumerate(model_data['modelreactions']):
+            if reaction == r['id']:
+                # remove in json and save
+                del model_data['modelreactions'][i]
+        return self.save_object(model_data, model_info[2], model.workspace_id, name=output_id)
 
 
     def add_reactions(self, model, new_reactions, workspace=None, name=None):

@@ -92,7 +92,7 @@ class mightymorphingmodelsTest(unittest.TestCase):
             "genome_workspace": ws,
             "media_name": "MR1_Minimal_Media",
             "media_workspace": ws,
-            "translate_media": False,
+            "translate_media": True,
             "num_reactions_to_process": "2",
             "workspace": ws
         }
