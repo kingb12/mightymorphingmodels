@@ -400,10 +400,11 @@ class Service:
         return self.save_object(obj, types()['FBAModel'], workspace, objid=model.object_id)
 
 
-    def adjust_gprs(self, model, adjustments):
+    def adjust_directions_and_gprs(self, model, adjustments):
         reactions_to_change = [{
             'change_reaction_id': [r[0]],
-            'change_reaction_gpr': str(r[1])[1:-1]
+            'change_reaction_direction': str(r[1]),
+            'change_reaction_gpr': str(r[2])[1:-1],
         } for r in adjustments]
         change_rxn_args = {'fbamodel_id': model.object_id,
                         'fbamodel_workspace': model.workspace_id,

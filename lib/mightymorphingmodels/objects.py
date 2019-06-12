@@ -230,7 +230,7 @@ class ModelReaction:
         """
         gets the reaction object reference if it is associated with a KBase Biochemistry. 'rxn00000' if not in a biochem
         """
-        return self.data['reaction_ref'].split('/')[-1]
+        return self.data['reaction_ref'].split('/')[-1].split('_')[0]
 
     def get_removal_id(self):
         """

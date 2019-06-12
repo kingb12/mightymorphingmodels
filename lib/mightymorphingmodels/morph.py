@@ -380,6 +380,7 @@ class Morph:
         # First, go through every reaction they have in common and adjust if
         # necessary:
         reactions_to_remove = []
+        adjustments = []
         for rxn_id in self.rxn_labels['common']:
             trans_rxn = self.rxn_labels['common'][rxn_id][0]  # MR
             recon_rxn = self.rxn_labels['common'][rxn_id][1]  # MR
@@ -387,7 +388,8 @@ class Morph:
             direction = _general_direction(trans_rxn, recon_rxn)
             if trans_rxn.gpr != merge_gpr or trans_rxn.get_direction() != direction:
                 self.merge_conflicts.append(rxn_id)
-                super_rxns[rxn_id] = (recon_rxn.get_rxn_ref(), recon_rxn.get_comp_ref(), direction, str(merge_gpr))
+                super_rxns[rxn_id] = recon_rxn
+                adjustments.append((recon_rxn.get_removal_id(), direction, merge_gpr))
                 removal_id = trans_rxn.get_removal_id()
                 reactions_to_remove.append(removal_id)
         # ---->
@@ -400,8 +402,7 @@ class Morph:
             if reaction.is_special_ref():
                 specials.append(reaction)
             else:
-                super_rxns[rxn_id] = (reaction.get_rxn_ref(), reaction.get_comp_ref(), reaction.get_direction())
-        adjustments = []
+                super_rxns[rxn_id] = reaction
         # Add the RECON reactions:
         for rxn_id in self.rxn_labels['recon']:
             reaction = self.rxn_labels['recon'][rxn_id]
@@ -413,12 +414,13 @@ class Morph:
                 specials.append(reaction)
             else:
                 if rxn_id not in super_rxns:
-                    super_rxns[rxn_id] = (reaction.get_rxn_ref(), reaction.get_comp_ref(), direction, str(reaction.gpr))
-                    adjustments.append((reaction.get_removal_id(), reaction.gpr))
+                    super_rxns[rxn_id] = reaction
+                    adjustments.append((reaction.get_removal_id(), direction, reaction.gpr))
+
         # ---->
-        result = self.service.add_reactions(self.model, super_rxns.values(), name='super_model')
+        result = self.service.add_reactions_manually(self.model, super_rxns.values(), name='super_model')
         self.model = FBAModel(result[0], result[1], service=self.service)
-        self.service.adjust_gprs(self.model, adjustments)
+        self.service.adjust_directions_and_gprs(self.model, adjustments)
         result = self.service.add_reactions_manually(self.model, specials, name='super_modelspc')
         self.model = FBAModel(result[0], result[1], service=self.service)
 
