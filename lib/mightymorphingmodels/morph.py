@@ -372,7 +372,6 @@ class Morph:
             self.merge_conflicts = []
         src_rxns = dict([(r.rxn_id(), r) for r in self.src_model.get_reactions()])
         super_rxns = dict()
-        super_rxns_full = dict()  # TODO consolidate if manual addition is better
         specials = list()
         # copy the trans model
         self.model = self.trans_model.copy(self.service, workspace_id=self.ws_id)
@@ -389,7 +388,6 @@ class Morph:
             if trans_rxn.gpr != merge_gpr or trans_rxn.get_direction() != direction:
                 self.merge_conflicts.append(rxn_id)
                 super_rxns[rxn_id] = (recon_rxn.get_rxn_ref(), recon_rxn.get_comp_ref(), direction, str(merge_gpr))
-                super_rxns_full[rxn_id] = recon_rxn
                 removal_id = trans_rxn.get_removal_id()
                 reactions_to_remove.append(removal_id)
         # ---->
@@ -403,7 +401,6 @@ class Morph:
                 specials.append(reaction)
             else:
                 super_rxns[rxn_id] = (reaction.get_rxn_ref(), reaction.get_comp_ref(), reaction.get_direction())
-                super_rxns_full[rxn_id] = reaction
         adjustments = []
         # Add the RECON reactions:
         for rxn_id in self.rxn_labels['recon']:
@@ -417,11 +414,9 @@ class Morph:
             else:
                 if rxn_id not in super_rxns:
                     super_rxns[rxn_id] = (reaction.get_rxn_ref(), reaction.get_comp_ref(), direction, str(reaction.gpr))
-                    super_rxns_full[rxn_id] = reaction
                     adjustments.append((reaction.get_removal_id(), reaction.gpr))
         # ---->
-        super_rxns = super_rxns.values()
-        result = self.service.add_reactions_manually(self.model, super_rxns_full.values(), name='super_model')
+        result = self.service.add_reactions(self.model, super_rxns.values(), name='super_model')
         self.model = FBAModel(result[0], result[1], service=self.service)
         self.service.adjust_gprs(self.model, adjustments)
         result = self.service.add_reactions_manually(self.model, specials, name='super_modelspc')
