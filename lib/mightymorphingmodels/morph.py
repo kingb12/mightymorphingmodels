@@ -655,7 +655,8 @@ class Morph:
                 self.log.add('Removed Reaction', [self.model, growth_condition.fba], [candidate_model],
                              context='process reactions')
                 # overwrite current morph with candidate
-                info = self.service.copy_object(candidate_model.identity, (self.model.identity[1], name))
+                info = self.service.copy_object((candidate_model.object_id, candidate_model.workspace_id),
+                                                (name, self.model.workspace_id))
                 self.model = FBAModel(info[0], info[1], service=self.service)
                 self.removed_ids[removal_id] = removal_list[i][1]
             else:
