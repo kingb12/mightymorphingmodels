@@ -84,7 +84,7 @@ class mightymorphingmodelsTest(unittest.TestCase):
         # Run your method by
         ws = "bking:narrative_1550692997297"
         params = {
-            "fbamodel_name": "shewanella_amazonesis_source_model",
+            "fbamodel_name": "shewanella_amazonesis_source_model_prefilled_2",
             "fbamodel_workspace": ws,
             "proteincomparison_name": "s_amazonesis_s_colwelliana_proteome_comparison",
             "proteincomparison_workspace": ws,
@@ -92,7 +92,7 @@ class mightymorphingmodelsTest(unittest.TestCase):
             "genome_workspace": ws,
             "media_name": "MR1_Minimal_Media",
             "media_workspace": ws,
-            "translate_media": True,
+            "translate_media": False,
             "num_reactions_to_process": "2",
             "workspace": ws
         }
