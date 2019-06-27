@@ -648,17 +648,19 @@ class Morph:
                 continue
             print '\nReaction to remove: ' + str(removal_id) + " / " + str(rxn)
             # TODO Find someway to fix the behavior bug if model_id is not in ws, etc.
-            info = self.service.remove_reaction(self.model, removal_id, output_id=name)
-            new_model = FBAModel(info[0], info[1], service=self.service)
-            if growth_condition.evaluate({'morph': self, 'model': new_model}):
+            info = self.service.remove_reaction(self.model, removal_id, output_id='morph_candidate')
+            candidate_model = FBAModel(info[0], info[1], service=self.service)
+            if growth_condition.evaluate({'morph': self, 'model': candidate_model}):
                 # removed successfully
-                self.log.add('Removed Reaction', [self.model, growth_condition.fba], [new_model],
+                self.log.add('Removed Reaction', [self.model, growth_condition.fba], [candidate_model],
                              context='process reactions')
-                self.model = new_model
+                # overwrite current morph with candidate
+                self.service.copy_object(candidate_model.identity, (self.model.identity[1], name))
+                self.model = candidate_model
                 self.removed_ids[removal_id] = removal_list[i][1]
             else:
                 # essential
-                self.log.add('Kept Reaction', [self.model, growth_condition.fba], [new_model],
+                self.log.add('Kept Reaction', [self.model, growth_condition.fba], [candidate_model],
                              context='process reactions')
                 self.essential_ids[removal_id] = removal_list[i][1]
             print self.log.actions[-1].type + ' ' + str(removal_id) + ', FBA was ' + str(growth_condition.fba.objective)
