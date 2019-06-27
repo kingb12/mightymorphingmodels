@@ -161,7 +161,7 @@ class Service:
         info = self.ws_client.copy_object({'from': {'workspace': from_tuple[1],
                                                'objid': from_tuple[0]},
                                       'to': {'workspace': to_tuple[1], 'name': to_tuple[0]}})
-        return info[7], info[0]
+        return info[0], info[7]
 
 
     def gapfill_model(self, model, media, workspace=None):
