@@ -282,7 +282,7 @@ class Service:
         recon_params = {u'genome_id': genome.object_id,
                         u'genome_workspace': genome.workspace_id,
                         u'fbamodel_output_id': 'recon_' + genome.name,
-                        u'gapfill_model': True,  # TODO parameterize as option
+                        u'gapfill_model': False,  # TODO parameterize as option
                         u'workspace': workspace}
         info = self.fba_client.build_metabolic_model(recon_params)
         # references returned here are sometimes inconsistent from other fba_tools APIs. Fetch obj info from ws service
