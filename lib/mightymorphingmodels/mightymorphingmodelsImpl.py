@@ -69,7 +69,8 @@ class mightymorphingmodels:
                          'proteincomparison_name',
                          'proteincomparison_workspace',
                          'genome_name',
-                         'genome_workspace']
+                         'genome_workspace',
+                         'output_name']
         for r in required_args:
             if r not in params:
                 raise ValueError("insufficient params supplied")
@@ -111,11 +112,11 @@ class mightymorphingmodels:
             else:
                 new_media = morph.media
             morph.translate_media(new_media)
-        output_id = params['output_id'] if 'output_id' in params else 'MorphedModel'
+        output_name = params['output_name'] if 'output_name' in params else 'MorphedModel'
         if 'num_reactions_to_process' in params:
-            morph.process_reactions(num_reactions=int(params['num_reactions_to_process']), name=output_id)
+            morph.process_reactions(num_reactions=int(params['num_reactions_to_process']), name=output_name)
         else:
-            morph.process_reactions(name=output_id)
+            morph.process_reactions(name=output_name)
 
         reportObj = {
             'objects_created':[],
