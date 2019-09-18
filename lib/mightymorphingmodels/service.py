@@ -304,13 +304,12 @@ class Service:
         :param reactions_to_remove: reactions to remove (removal_id's)
         :return:
         """
-        removed = set()
         model_data, model_info = self.get_object(model.object_id, model.workspace_id)
-        for i, r in enumerate(model_data['modelreactions']):
-            if r['id'] in reactions_to_remove:
-                # remove in json and save
-                del model_data['modelreactions'][i]
-                removed.add(r['id'])
+        rxns_to_remove = set(reactions_to_remove)
+        prior_ids = set([r['id'] for r in model_data['modelreactions']])
+        model_data['modelreactions'] = [r for r in model_data['modelreactions'] if r['id'] not in rxns_to_remove]
+        current_ids = set([r['id'] for r in model_data['modelreactions']])
+        removed = set([rxn_id for rxn_id in prior_ids if rxn_id not in current_ids])
         if len(reactions_to_remove) != len(removed):
             print "WARNING: expected to remove", len(reactions_to_remove), "reactions but only removed", removed
             print "Failed to remove", set(reactions_to_remove) - removed
