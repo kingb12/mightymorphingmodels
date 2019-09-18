@@ -111,10 +111,11 @@ class mightymorphingmodels:
             else:
                 new_media = morph.media
             morph.translate_media(new_media)
+        output_id = params['output_id'] if 'output_id' in params else 'MorphedModel'
         if 'num_reactions_to_process' in params:
-            morph.process_reactions(num_reactions=int(params['num_reactions_to_process']))
+            morph.process_reactions(num_reactions=int(params['num_reactions_to_process']), name=output_id)
         else:
-            morph.process_reactions()
+            morph.process_reactions(name=output_id)
 
         reportObj = {
             'objects_created':[],
