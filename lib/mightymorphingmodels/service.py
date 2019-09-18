@@ -304,11 +304,16 @@ class Service:
         :param reactions_to_remove: reactions to remove (removal_id's)
         :return:
         """
+        removed = 0
         model_data, model_info = self.get_object(model.object_id, model.workspace_id)
         for i, r in enumerate(model_data['modelreactions']):
             if r['id'] in reactions_to_remove:
                 # remove in json and save
                 del model_data['modelreactions'][i]
+                removed += 1
+        if len(reactions_to_remove) != removed:
+            print "WARNING: expected to remove", len(reactions_to_remove), "reactions but only removed", removed
+            print "reactions_to_remove:", ', '.join(reactions_to_remove)
         return self.save_object(model_data, model_info[2], model.workspace_id, name=model.name)
 
 

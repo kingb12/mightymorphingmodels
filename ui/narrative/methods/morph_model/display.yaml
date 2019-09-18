@@ -4,7 +4,7 @@
 name: Morph Model
 
 tooltip: |
-    Calls fba_tools and removes reaction 1
+    Morphs a source FBA model from its given organism to a target organism, without losing the ability to grow on a given media
 
 screenshots: []
 
@@ -100,4 +100,8 @@ parameters :
         long-hint : |
             FBAModel output
 description : |
-    This app is to morph models.
+    Takes a Model/Genome for a 'source' organism and 'morphs' it to the 'target' organism. It keeps reactions from the
+     'source' model for which there is at least one matching gene feature, and attempts to remove those in the source model
+     that do not have BLAST hits in the second genome. It also adds reactions annotated within the target genome that
+     are unique to the target organism. The model is never broken in the process, such that the Biomass reaction and
+     any other specified reaction must always carry flux.
