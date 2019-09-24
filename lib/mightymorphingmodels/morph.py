@@ -399,6 +399,8 @@ class Morph:
         # Add the GENE_NO_MATCH reactions:
         for rxn_id in self.rxn_labels['gene-no-match']:
             reaction = self.rxn_labels['gene-no-match'][rxn_id]
+            # need to remove gene references to avoid miscounting a gene that actually belongs to source organism
+            reaction.data['modelReactionProteins'] = []
             if reaction.is_special_ref():
                 specials.append(reaction)
             else:

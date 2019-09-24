@@ -9,6 +9,17 @@ venn2_keys = ['10', '01', '11']
 
 
 def venn3(subsets, title, unit_title, filename, set_labels=None, normalize=1.0, annotation=None):
+    """
+
+    :param subsets:
+    :param title:
+    :param unit_title:
+    :param filename:
+    :param set_labels:
+    :param normalize:
+    :param annotation:
+    :return:
+    """
     plt.figure()
     v = venn.venn3_unweighted(subsets=subsets, set_labels=set_labels)
     c = venn.venn3_circles(subsets=(1,1,1,1,1,1,1), linestyle='solid', linewidth=1.5, normalize_to=normalize)
