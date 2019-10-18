@@ -1,5 +1,5 @@
-from service import Service
-import objects
+from . import objects
+
 
 class AbstractGrowthCondition:
     """
@@ -23,6 +23,7 @@ class AbstractGrowthCondition:
 
     def evaluate(self, arguments):
         raise NotImplementedError()
+
 
 class SimpleCondition(AbstractGrowthCondition):
     """
@@ -48,10 +49,10 @@ class BarkeriCondition(AbstractGrowthCondition):
     """
     def evaluate(self, arguments):
         raise NotImplementedError()
-        morph = arguments['morph']
-        model = arguments['model'] if 'model' in arguments else morph.model
-        info = self.service.runfba(model, morph.media, workspace=morph.ws_id)
-        fba = objects.FBA(info[0], info[1], service=self.service)
+        # morph = arguments['morph']
+        # model = arguments['model'] if 'model' in arguments else morph.model
+        # info = self.service.runfba(model, morph.media, workspace=morph.ws_id)
+        # fba = objects.FBA(info[0], info[1], service=self.service)
 
 
 class AllMedia(AbstractGrowthCondition):

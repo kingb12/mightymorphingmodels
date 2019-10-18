@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
-from service import Service
-from objects import *
-from morph import Morph
+import logging
+
+from .service import Service
+from .objects import *
+from .morph import Morph
 import uuid, sys, os, traceback
+from installed_clients.KBaseReportClient import KBaseReport
 #END_HEADER
 
 
@@ -23,8 +26,8 @@ class mightymorphingmodels:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/kingb12/mightymorphingmodels.git"
-    GIT_COMMIT_HASH = "7b416108e6c72e521a1d2d69974b7ebe951fe197"
+    GIT_URL = ""
+    GIT_COMMIT_HASH = ""
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -34,8 +37,10 @@ class mightymorphingmodels:
     def __init__(self, config):
         #BEGIN_CONSTRUCTOR
         self.callback_url = os.environ['SDK_CALLBACK_URL']
-        self.workspaceURL = config['workspace-url']
-        self.scratch = config['scratch']
+        self.workspace_url = config['workspace-url']
+        self.shared_folder = config['scratch']
+        logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
+                        level=logging.INFO)
         #END_CONSTRUCTOR
         pass
 
@@ -61,7 +66,7 @@ class mightymorphingmodels:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN morph_model
-        self.service = Service(self.callback_url, self.workspaceURL, ctx)
+        self.service = Service(self.callback_url, self.workspace_url, ctx)
         required_args = ['fbamodel_name',
                          'fbamodel_workspace',
                          'media_name',
@@ -73,7 +78,7 @@ class mightymorphingmodels:
                          'output_name']
         for r in required_args:
             if r not in params:
-                raise ValueError("insufficient params supplied")
+                raise ValueError("insufficient params supplied: " + str(r))
 
 
         def _translate_obj_identity(workspace, name):
@@ -161,7 +166,6 @@ class mightymorphingmodels:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
-
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

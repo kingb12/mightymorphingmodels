@@ -1,10 +1,9 @@
-# import necesary services
-import copy
-import json
+# import necessaryy services
 
-import GrowthConditions
-from log import Log
-from objects import *
+
+from . import GrowthConditions
+from .log import Log
+from .objects import *
 
 
 
@@ -135,7 +134,7 @@ class Morph:
         for key in vars(self):
             attr = getattr(self, key)
             if isinstance(attr, dict):
-                attr = attr.keys()
+                attr = list(attr.keys())
                 if len(attr) < 100:
                     output += str(key) + ': ' + str(attr) + '\n'
                 else:
@@ -148,7 +147,7 @@ class Morph:
         return str(self)
 
     def __unicode__(self):
-        return unicode(str(self))
+        return str(str(self))
 
     def fill_src_to_media(self):
         """
@@ -300,7 +299,7 @@ class Morph:
                            'recon': dict(),
                            'common': dict()}
         # Some reference sets
-        all_reactions = set(model_dict.keys()).union(recon_dict.keys())
+        all_reactions = set(model_dict.keys()).union(list(recon_dict.keys()))
         for rxn in all_reactions:
             if rxn in trans_dict and rxn in recon_dict:
                 self.rxn_labels['common'][rxn] = (trans_dict[rxn], recon_dict[rxn])
@@ -420,7 +419,7 @@ class Morph:
                     adjustments.append((reaction.get_removal_id(), direction, reaction.gpr))
 
         # ---->
-        result = self.service.add_reactions_manually(self.model, super_rxns.values(), name='super_model')
+        result = self.service.add_reactions_manually(self.model, list(super_rxns.values()), name='super_model')
         self.model = FBAModel(result[0], result[1], service=self.service)
         self.service.adjust_directions_and_gprs(self.model, adjustments)
         result = self.service.add_reactions_manually(self.model, specials, name='super_modelspc')
@@ -627,9 +626,9 @@ class Morph:
         # label argument behavior
         if rxn_list is None:
             rxn_dict = self.rxn_labels['gene-no-match']
-            removal_list = sorted(rxn_dict.items(), key=get_key)
+            removal_list = sorted(list(rxn_dict.items()), key=get_key)
             rxn_dict = self.rxn_labels['no-gene']
-            removal_list += sorted(rxn_dict.items(), key=get_key)
+            removal_list += sorted(list(rxn_dict.items()), key=get_key)
             removal_list = [r for r in removal_list if r[0] not in self.rxn_labels['common']]
         else:
             removal_list = rxn_list
@@ -648,7 +647,7 @@ class Morph:
             if removal_id.startswith('rxn00000'):
                 self.log.add('skip', [self.model, removal_list[i][1]], [None], context='process_reactions')
                 continue
-            print '\nReaction to remove: ' + str(removal_id) + " / " + str(rxn)
+            print('\nReaction to remove: ' + str(removal_id) + " / " + str(rxn))
             # TODO Find someway to fix the behavior bug if model_id is not in ws, etc.
             info = self.service.remove_reaction(self.model, removal_id, output_id='morph_candidate')
             candidate_model = FBAModel(info[0], info[1], service=self.service)
@@ -666,7 +665,7 @@ class Morph:
                 self.log.add('Kept Reaction', [self.model, growth_condition.fba], [candidate_model],
                              context='process reactions')
                 self.essential_ids[removal_id] = removal_list[i][1]
-            print self.log.actions[-1].type + ' ' + str(removal_id) + ', FBA was ' + str(growth_condition.fba.objective)
+            print(self.log.actions[-1].type + ' ' + str(removal_id) + ', FBA was ' + str(growth_condition.fba.objective))
         return self
 
     def get_prob(self, rxn_id):

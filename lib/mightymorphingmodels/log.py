@@ -1,5 +1,5 @@
 import copy
-import objects
+from . import objects
 import json
 
 #String constants

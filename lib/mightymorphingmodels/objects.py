@@ -1,4 +1,4 @@
-from service import types
+from .service import types
 import copy
 import json
 
@@ -418,7 +418,7 @@ class Gpr:
         return not self.__eq__(other)
 
     def __unicode__(self):
-        return unicode(str(self))
+        return str(str(self))
 
     @staticmethod
     def _gpr_set(rxn_object):
@@ -432,7 +432,7 @@ class Gpr:
         prots = set()
         for i in range(0, len(rxn_proteins)):
             prot = set()
-            if rxn_proteins[i]['note'] == u'spontaneous' or rxn_proteins[i]['note'] == u'universal':
+            if rxn_proteins[i]['note'] == 'spontaneous' or rxn_proteins[i]['note'] == 'universal':
                 return frozenset([frozenset([frozenset([])])]), rxn_proteins[i]['note']
             subunits = rxn_proteins[i]['modelReactionProteinSubunits']
             for j in range(0, len(subunits)):
@@ -552,9 +552,9 @@ class Gpr:
         return_gpr = self.new_gpr(frozenset(g2))
         return_gpr.remove_redundancy()
         if examine_gpr:
-            return_gpr.gpr_type = u'potential merge conflict'
+            return_gpr.gpr_type = 'potential merge conflict'
         else:
-            return_gpr.gpr_type = u'merge'
+            return_gpr.gpr_type = 'merge'
         return_gpr.parents = (self, other_gpr)
         return_gpr._check_rep()
         return return_gpr
@@ -626,7 +626,7 @@ class Gpr:
                 for sub in protein:
                     assert type(sub) is frozenset
                     for ftr in sub:
-                        assert type(ftr) is str or type(ftr) is unicode
+                        assert type(ftr) is str or type(ftr) is str
 
     def _unnest_sets(self, nested_set):
         """

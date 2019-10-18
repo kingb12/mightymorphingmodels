@@ -1,8 +1,7 @@
 import random
 
-from fba_tools.fba_toolsClient import fba_tools
-from Workspace.WorkspaceClient import Workspace
-from Workspace.baseclient import ServerError
+from installed_clients.fba_toolsClient import fba_tools
+from installed_clients.WorkspaceClient import Workspace
 
 # =====================================================================================================================
 # Type Strings From KBase
@@ -100,12 +99,12 @@ class Service:
         :param name: (optional) string name for the pbject to be saved
         :return: a list of information about the object as it is stored in KBase
         """
-        sv = {u'data': data, u'type': type, u'name': name}
+        sv = {'data': data, 'type': type, 'name': name}
         if objid is not None:
-            sv[u'objid'] = objid
+            sv['objid'] = objid
         if name is not None:
-            sv[u'name'] = name
-        info = self.ws_client.save_objects({u'workspace': wsid, u'objects': [sv]})[0]
+            sv['name'] = name
+        info = self.ws_client.save_objects({'workspace': wsid, 'objects': [sv]})[0]
         return info[0], info[7]
 
 
@@ -175,13 +174,13 @@ class Service:
         """
         if workspace is None:
             workspace = model.workspace_id
-        params = {u'fbamodel_id': str(model.object_id),
-                  u'fbamodel_workspace': str(model.workspace_id),
-                  u'fbamodel_output_id': str(model.name),
-                  u'workspace': workspace,
-                  u'media_id': media.object_id,
-                  u'media_workspace': media.workspace_id,
-                  u'comprehensive_gapfill': False}
+        params = {'fbamodel_id': str(model.object_id),
+                  'fbamodel_workspace': str(model.workspace_id),
+                  'fbamodel_output_id': str(model.name),
+                  'workspace': workspace,
+                  'media_id': media.object_id,
+                  'media_workspace': media.workspace_id,
+                  'comprehensive_gapfill': False}
         self.fba_client.gapfill_metabolic_model(params)
         return model.object_id, model.workspace_id
 
@@ -206,7 +205,7 @@ class Service:
 
 
     def fba_formulation(self, media):
-        return {u'media': str(media.object_id), u'media_workspace': str(media.workspace_id)}
+        return {'media': str(media.object_id), 'media_workspace': str(media.workspace_id)}
 
 
     def runfba(self, model, media, workspace=None):
@@ -220,12 +219,12 @@ class Service:
         """
         if workspace is None:
             workspace = model.workspace_id
-        fba_params = {u'workspace': workspace,
-                      u'fbamodel_id': model.object_id,
-                      u'fbamodel_workspace': model.workspace_id,
-                      u'media_workspace': str(media.workspace_id),
-                      u'media_id': str(media.object_id),
-                      u'fba_output_id': model.name + '_fba'}
+        fba_params = {'workspace': workspace,
+                      'fbamodel_id': model.object_id,
+                      'fbamodel_workspace': model.workspace_id,
+                      'media_workspace': str(media.workspace_id),
+                      'media_id': str(media.object_id),
+                      'fba_output_id': model.name + '_fba'}
         info = self.fba_client.run_flux_balance_analysis(fba_params)
         obj_id = info['new_fba_ref'].split('/')[1]
         return obj_id, workspace
@@ -242,8 +241,8 @@ class Service:
         """
         if workspace is None:
             workspace = model.workspace_id
-        fba_params = {u'workspace': workspace, u'model': model.object_id, u'model_workspace': model.workspace_id,
-                      u'formulation': self.fba_formulation(media), u'fva': True}
+        fba_params = {'workspace': workspace, 'model': model.object_id, 'model_workspace': model.workspace_id,
+                      'formulation': self.fba_formulation(media), 'fva': True}
         info = self.fba_client.runfba(fba_params)
         obj_id = info['new_fba_ref'].split('/')[1]
         return obj_id, workspace
@@ -258,13 +257,13 @@ class Service:
         """
         if workspace is None:
             workspace = src_model.workspace_id
-        trans_params = {u'keep_nogene_rxn': 1,
-                        u'proteincomparison_id': protcomp.object_id,
-                        u'proteincomparison_workspace': protcomp.workspace_id,
-                        u'fbamodel_id': src_model.object_id,
-                        u'fbamodel_output_id': 'translated_' + src_model.name,
-                        u'fbamodel_workspace': src_model.workspace_id,
-                        u'workspace': workspace}
+        trans_params = {'keep_nogene_rxn': 1,
+                        'proteincomparison_id': protcomp.object_id,
+                        'proteincomparison_workspace': protcomp.workspace_id,
+                        'fbamodel_id': src_model.object_id,
+                        'fbamodel_output_id': 'translated_' + src_model.name,
+                        'fbamodel_workspace': src_model.workspace_id,
+                        'workspace': workspace}
         info = self.fba_client.propagate_model_to_new_genome(trans_params)
         obj_id = info['new_fbamodel_ref'].split('/')[1]
         return obj_id, workspace
@@ -279,11 +278,11 @@ class Service:
         """
         if workspace is None:
             workspace = genome.workspace_id
-        recon_params = {u'genome_id': genome.object_id,
-                        u'genome_workspace': genome.workspace_id,
-                        u'fbamodel_output_id': 'recon_' + genome.name,
-                        u'gapfill_model': False,  # TODO parameterize as option
-                        u'workspace': workspace}
+        recon_params = {'genome_id': genome.object_id,
+                        'genome_workspace': genome.workspace_id,
+                        'fbamodel_output_id': 'recon_' + genome.name,
+                        'gapfill_model': False,  # TODO parameterize as option
+                        'workspace': workspace}
         info = self.fba_client.build_metabolic_model(recon_params)
         # references returned here are sometimes inconsistent from other fba_tools APIs. Fetch obj info from ws service
         obj_name = info['new_fbamodel_ref'].split('/')[1]
@@ -311,9 +310,9 @@ class Service:
         current_ids = set([r['id'] for r in model_data['modelreactions']])
         removed = set([rxn_id for rxn_id in prior_ids if rxn_id not in current_ids])
         if len(reactions_to_remove) != len(removed):
-            print "WARNING: expected to remove", len(reactions_to_remove), "reactions but only removed", removed
-            print "Failed to remove", set(reactions_to_remove) - removed
-            print "Full arg reactions_to_remove:", ', '.join(reactions_to_remove)
+            print("WARNING: expected to remove", len(reactions_to_remove), "reactions but only removed", removed)
+            print("Failed to remove", set(reactions_to_remove) - removed)
+            print("Full arg reactions_to_remove:", ', '.join(reactions_to_remove))
         return self.save_object(model_data, model_info[2], model.workspace_id, name=model.name)
 
 
@@ -392,7 +391,7 @@ class Service:
                 if c not in cpds:
                     compound = {'id': c,
                                 'name': c,
-                                'aliases': [u'mdlid:' + c.split('_')[0]],
+                                'aliases': ['mdlid:' + c.split('_')[0]],
                                 'charge': 0,
                                 'compound_ref': '489/6/6/compounds/id/cpd00000',
                                 'modelcompartment_ref': '~/modelcompartments/id/' + c.split('_')[-1],
@@ -471,7 +470,7 @@ class Service:
                     ws_id = new_ws[0]
                     ws_name = new_ws[1]
                     ws_conflict = False
-                except ServerError:
+                except BaseException:
                     ws_name += str(random.randint(1, 9))
         return ws_id, ws_name
 
