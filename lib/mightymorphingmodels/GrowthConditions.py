@@ -1,5 +1,10 @@
+import logging
 from . import objects
+import cobrakbase
+from cobrakbase.core import KBaseFBAModel, KBaseBiochemMedia
+from cobrakbase.core.converters import KBaseFBAModelToCobraBuilder
 
+logger = logging.getLogger(__name__)
 
 class AbstractGrowthCondition:
     """
@@ -42,6 +47,31 @@ class SimpleCondition(AbstractGrowthCondition):
         self.fba = objects.FBA(info[0], info[1], service=self.service)
         return self.fba.objective > 0.0
 
+class CobraCondition(AbstractGrowthCondition):
+    """
+    a growth conditon for absolute growth (objective > 0)
+
+    Required attributes of args:
+        - morph
+        - model
+        - fba_name
+    """
+
+    def evaluate(self, arguments):
+        morph = arguments['morph']
+        model = arguments['model'] if 'model' in arguments else morph.model
+        
+        fbamodel = KBaseFBAModel(model.get_object())
+        m = KBaseBiochemMedia(morph.media.get_object())
+        cobra_model = KBaseFBAModelToCobraBuilder(fbamodel).with_media(m).build()
+        solution = cobra_model.optimize()
+        
+        if not solution.status == 'optimal':
+            return False
+        
+        logger.debug('solution %s', solution)
+        self.fba = solution
+        return solution.objective_value > 0.0 #intead of 0.0 should be EPS
 
 class BarkeriCondition(AbstractGrowthCondition):
     """

@@ -123,6 +123,7 @@ class mightymorphingmodels:
         else:
             morph.process_reactions(name=output_name)
 
+        
         reportObj = {
             'objects_created':[],
             'text_message': "MIGHTY"
