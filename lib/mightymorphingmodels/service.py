@@ -20,6 +20,8 @@ def types():
 # TODO: More pragmatic approach, have these stored in some sort of XML or plain text file that can be read in
 # =====================================================================================================================
 
+
+
 class Service:
     def __init__(self, fba_url, ws_url, ctx):
         self.ws_client = Workspace(ws_url, token=ctx['token'])
@@ -476,3 +478,9 @@ class Service:
 
     def _parse_objid_from_ref(self, ref):
         return ref.split('/')[1]
+    
+class DummyService(Service):
+    
+    def __init__(self):
+        self.ws_client = None
+        self.fba_client = None

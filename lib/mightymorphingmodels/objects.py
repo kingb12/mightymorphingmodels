@@ -1,6 +1,9 @@
-from .service import types
+import logging
 import copy
 import json
+from .service import types
+
+logger = logging.getLogger(__name__)
 
 # Some repeated string constants
 OBJECT_ID = 'object_id'
@@ -17,10 +20,13 @@ class StoredObject(object):
 
     # The current environment is KBase, where all calls to the API refer to their objects by ids and workspace_ids
 
-    def __init__(self, object_id, workspace_id, service=None):
+    def __init__(self, object_id, workspace_id, service=None, data=None, persistent=True):
+        #toggle to use service
+        self.persistent = persistent
+        
         self.identity = (object_id, workspace_id)
         self._name = None
-        self._data = None  # BE MINDFUL OF THIS. IF YOU FIND A BUG CAUSED BY THIS NAMING, CHANGE IT
+        self._data = data  # BE MINDFUL OF THIS. IF YOU FIND A BUG CAUSED BY THIS NAMING, CHANGE IT
         self._ver = None
         self._check_rep()
         self.service = service  # Ugly. The service managing this object (has ws client). A refactor can remove this
@@ -84,6 +90,10 @@ class StoredObject(object):
         the interior elements of this dictionary are NOT the same as the classes representing them. If you want data
         from the interior of the object, it is best to use the abstractions provided by it's more specific type.
         """
+        
+        if not self.persistent:
+            return self._data
+        
         self._check_rep()
         meta_data = self.service.get_object(self.object_id, self.workspace_id)
         self._data = meta_data[0]
@@ -169,6 +179,21 @@ class FBAModel(StoredObject):
 
     DEFAULT_BIOCHEM = Biochemistry(6, 489)
 
+    def add_reaction(self, rxn):
+        object_data = self.get_object()
+        object_data['modelreactions'].append(rxn)
+
+    def remove_reaction(self, rxn_id):
+        object_data = self.get_object()
+        excluded = list(filter(lambda x : x['id'] == rxn_id, object_data['modelreactions']))
+        rem_list = list(filter(lambda x : not x['id'] == rxn_id, object_data['modelreactions']))
+        if len(rem_list) == len(object_data['modelreactions']):
+            logger.warning('reaction %s not in model', rxn_id)
+            return []
+
+        object_data['modelreactions'] = rem_list
+        return excluded
+    
     def get_reactions(self):
         """
         Returns a list of ModelReaction objects representing this model's reactions
@@ -186,6 +211,13 @@ class FBAModel(StoredObject):
         for r in rxns:
             features |= r.gpr.ftrs
         return features
+    
+    def clone(self):
+        return FBAModel(self.identity[0], 
+                        self.identity[1],
+                        self.service, 
+                        copy.deepcopy(self.get_object()),
+                        self.persistent)
 
 
 class ModelReaction:
@@ -708,8 +740,8 @@ class FBA(StoredObject):
     """
     storedType = types()['FBA']
 
-    def __init__(self, object_id, workspace_id, service=None):
-        super(FBA, self).__init__(object_id, workspace_id, service=service)
+    def __init__(self, object_id, workspace_id, service=None, data=None, persistent=True):
+        super(FBA, self).__init__(object_id, workspace_id, service=service, data=data, persistent=persistent)
         self.objective = self.get_objective()
 
     def get_objective(self):
@@ -826,8 +858,8 @@ class ReactionProbabilities(StoredObject):
     """
     storedType = types()['ReactionProbabilities']
 
-    def __init__(self, object_id, workspace_id, service=None):
-        super(ReactionProbabilities, self).__init__(object_id, workspace_id, service=service)
+    def __init__(self, object_id, workspace_id, service=None, data=None, persistent=True):
+        super(ReactionProbabilities, self).__init__(object_id, workspace_id, service=service, data=data, persistent=persistent)
         self._prob_hash = None
 
     def probability_hash(self):

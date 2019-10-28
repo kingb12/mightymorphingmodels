@@ -1,12 +1,12 @@
 # import necessaryy services
-
+import logging
 
 from . import GrowthConditions
 from .log import Log
 from .objects import *
 
 
-
+logger = logging.getLogger(__name__)
 
 class Morph:
     # These are the allowed properties of a morph object. Values not specified
@@ -667,6 +667,73 @@ class Morph:
                 self.essential_ids[removal_id] = removal_list[i][1]
             print(self.log.actions[-1].type + ' ' + str(removal_id) + ', FBA was ' + str(growth_condition.fba.objective))
         return self
+    
+    def process_reactions2(self, rxn_list=None, name=None, growth_condition=None, num_reactions=-1):
+        if growth_condition is None:
+            growth_condition = GrowthConditions.CobraCondition(service=self.service)
+        """
+        Alternative process_reactions using cobrapy for optimization and inmemory model maniputation
+
+        """
+        ws = self.ws_id
+        # Sort by probanno. items() returns (K, V=(model_index, prob))
+
+        def get_key(item):
+            return self.get_prob(item[0])
+
+        # label argument behavior
+        if rxn_list is None:
+            rxn_dict = self.rxn_labels['gene-no-match']
+            removal_list = sorted(list(rxn_dict.items()), key=get_key)
+            rxn_dict = self.rxn_labels['no-gene']
+            removal_list += sorted(list(rxn_dict.items()), key=get_key)
+            removal_list = [r for r in removal_list if r[0] not in self.rxn_labels['common']]
+        else:
+            removal_list = rxn_list
+        # instantiate lists only if needed
+        if self.essential_ids is None:
+            self.essential_ids = dict()
+        if self.removed_ids is None:
+            self.removed_ids = dict()
+        # Give objs a general name if none is provided
+        if name is None:
+            name = 'MorphedModel'
+            
+        max_rxns = num_reactions >= 0 and num_reactions or len(removal_list)
+        
+        new_model = self.model.clone()
+        new_model.persistent = False
+        
+        for i in range(max_rxns):
+            removal_id = removal_list[i][1].get_removal_id()
+            rxn = removal_list[i][0]
+            
+            if removal_id.startswith('rxn00000'):
+                self.log.add('skip', [self.model, removal_list[i][1]], [None], context='process_reactions')
+                continue
+            
+            logger.debug('Reaction to remove: %s / %s', removal_id, rxn)
+            removed = new_model.remove_reaction(removal_id)
+            if growth_condition.evaluate({'morph': self, 'model': new_model}):
+                logger.debug('Reaction to remove: %s / %s [REMOVED]', removal_id, rxn)
+                # removed successfully
+                self.log.add('Removed Reaction', 
+                             [self.model, growth_condition.fba], 
+                             [new_model],
+                             context='process reactions')
+                self.removed_ids[removal_id] = removal_list[i][1]
+            else:
+                logger.debug('Reaction to remove: %s / %s [ESSENTIAL]', removal_id, rxn)
+                # essential
+                self.log.add('Kept Reaction', 
+                             [self.model, growth_condition.fba], 
+                             [new_model],
+                             context='process reactions')
+                self.essential_ids[removal_id] = removal_list[i][1]
+                for r in removed:
+                    new_model.add_reaction(r)
+                    
+        return new_model
 
     def get_prob(self, rxn_id):
         '''

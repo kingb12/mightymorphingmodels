@@ -119,10 +119,11 @@ class mightymorphingmodels:
             morph.translate_media(new_media)
         output_name = params['output_name'] if 'output_name' in params else 'MorphedModel'
         if 'num_reactions_to_process' in params:
-            morph.process_reactions(num_reactions=int(params['num_reactions_to_process']), name=output_name)
+            morph.process_reactions2(num_reactions=int(params['num_reactions_to_process']), name=output_name)
         else:
-            morph.process_reactions(name=output_name)
+            morph.process_reactions2(name=output_name)
 
+        
         reportObj = {
             'objects_created':[],
             'text_message': "MIGHTY"
