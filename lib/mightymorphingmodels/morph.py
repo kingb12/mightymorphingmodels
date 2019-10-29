@@ -732,8 +732,12 @@ class Morph:
                 self.essential_ids[removal_id] = removal_list[i][1]
                 for r in removed:
                     new_model.add_reaction(r)
-                    
-        return new_model
+
+        # after processing ALL reactions, lets save if the calling model was persistent
+        if self.model.persistent:
+            info = self.service.save_object(new_model.data, types()['FBAModel'], self.model.workspace_id, name=name)
+            self.model = FBAModel(info[0], info[1], self.service)
+        return self
 
     def get_prob(self, rxn_id):
         '''
